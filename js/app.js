@@ -1,9 +1,11 @@
 /* Atelier — application */
 (()=>{
 'use strict';
-const SB_URL='https://csotfcbypwxjsalqfidk.supabase.co';
-const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzb3RmY2J5cHd4anNhbHFmaWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUyNzAyNjAsImV4cCI6MjExMDg0NjI2MH0.habToLedke2YlUrPyx1qigX4e_N0KUJfImbBJEmUx2M';
-let sb=null;try{if(window.supabase)sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){sb=null}
+/* Même projet Firebase que Mission Bip et Bip Agence : un seul compte pour les trois sites */
+const FB_CONFIG={apiKey:"AIzaSyDF6idRWnpsezjXYQ_f_7_58O2prxvA9Gc",authDomain:"bip-jeux.firebaseapp.com",projectId:"bip-jeux",storageBucket:"bip-jeux.firebasestorage.app",messagingSenderId:"518939054835",appId:"1:518939054835:web:737987fffa793c14a25d86"};
+let fb=null,auth=null,db=null;
+try{if(window.firebase&&firebase.initializeApp){fb=firebase.apps.length?firebase.app():firebase.initializeApp(FB_CONFIG);auth=firebase.auth();db=firebase.firestore()}}catch(e){fb=null}
+const sb=auth; /* présence du service de comptes */
 
 /* ---------- utils ---------- */
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
@@ -31,63 +33,61 @@ const fid=(k,key)=>k+'::'+key;
 function favBtn(kind,key,label,data,ico){const id=fid(kind,key);REG.set(id,{kind,key,label,data:data||{}});const on=favs.has(id);return `<button class="fav${ico?' ico':''}" data-fid="${esc(id)}" aria-pressed="${on}" title="${on?'Retirer des favoris':'Ajouter aux favoris'}" aria-label="Favori : ${esc(label)}">${ico?(on?'★':'☆'):(on?'★ Favori':'☆ Favori')}</button>`}
 function refreshFav(){$$('.fav[data-fid]').forEach(b=>{const on=favs.has(b.dataset.fid);b.setAttribute('aria-pressed',on);b.title=on?'Retirer des favoris':'Ajouter aux favoris';b.textContent=b.classList.contains('ico')?(on?'★':'☆'):(on?'★ Favori':'☆ Favori')});$('#favCount').textContent=favs.size;if(current==='espace')renderEspace();if(current==='artistes'&&af==='fav')renderArtists();if(current==='lexique'&&lf==='fav')renderLex()}
 const saveLocal=()=>store.set(LOCAL,[...favs.values()]);
+const favRef=()=>db.collection('eleves').doc(user.uid).collection('atelier').doc('favoris');
+let saveT=null,denied=false;
+function saveRemote(){clearTimeout(saveT);saveT=setTimeout(async()=>{if(!user)return;try{await favRef().set({data:JSON.stringify([...favs.values()]),email:user.email||'',updatedAt:firebase.firestore.FieldValue.serverTimestamp()});denied=false}catch(e){if(/permission/.test(String(e.code||e.message))){denied=true;saveLocal();toast('Favoris gardés sur cet appareil : la sauvegarde en ligne d\u2019Atelier n\u2019est pas encore activée (prévenez votre formateur).')}else toast('Sauvegarde impossible, réessayez')}},400)}
+function persist(){if(user)saveRemote();else saveLocal()}
 async function toggleFav(id){
   const r=REG.get(id)||favs.get(id);if(!r)return;
-  if(favs.has(id)){
-    favs.delete(id);refreshFav();
-    if(user){const {error}=await sb.from('favorites').delete().eq('kind',r.kind).eq('key',r.key);if(error)toast('Synchronisation impossible, réessayez')}else saveLocal();
-  }else{
-    const row={kind:r.kind,key:r.key,label:r.label,data:r.data||{}};favs.set(id,row);refreshFav();
-    if(user){const {error}=await sb.from('favorites').insert({...row,user_id:user.id});if(error&&error.code!=='23505'){favs.delete(id);refreshFav();toast('Enregistrement impossible : '+error.message)}else toast('Ajouté à votre espace ★')}
-    else{saveLocal();if(!nudged){nudged=true;toast('Gardé sur cet appareil. <a href="#" data-open-auth>Créez un compte</a> pour le retrouver partout.',true)}else toast('Ajouté à votre espace ★')}
-  }
+  if(favs.has(id)){favs.delete(id);refreshFav();persist();return}
+  favs.set(id,{kind:r.kind,key:r.key,label:r.label,data:r.data||{}});refreshFav();persist();
+  if(!user&&!nudged){nudged=true;toast('Gardé sur cet appareil. <a href="#" data-open-auth>Créez un compte</a> pour le retrouver partout.',true)}else toast('Ajouté à votre espace ★')
 }
 function addFav(kind,key,label,data){const id=fid(kind,key);REG.set(id,{kind,key,label,data});if(favs.has(id)){toast('Déjà dans votre espace');return}toggleFav(id)}
+async function remoteFavs(){try{const d=await favRef().get();return d.exists?JSON.parse(d.data().data||'[]'):[]}catch(e){if(/permission/.test(String(e.code||e.message)))denied=true;return null}}
 async function loadFavs(){
-  if(user){const {data,error}=await sb.from('favorites').select('kind,key,label,data,created_at').order('created_at',{ascending:false});if(error){toast('Favoris indisponibles : '+error.message);return}favs=new Map(data.map(r=>[fid(r.kind,r.key),r]))}
-  else favs=new Map(store.get(LOCAL,[]).map(r=>[fid(r.kind,r.key),r]));
-  refreshFav();
+  let rows=store.get(LOCAL,[]);
+  if(user){const remote=await remoteFavs();if(remote){const m=new Map(remote.map(r=>[fid(r.kind,r.key),r]));let added=0;rows.forEach(r=>{const k=fid(r.kind,r.key);if(!m.has(k)){m.set(k,r);added++}});favs=m;if(added){saveRemote();toast(added+' favori'+(added>1?'s':'')+' de cet appareil ajouté'+(added>1?'s':'')+' à votre compte')}if(!denied)store.del(LOCAL);refreshFav();return}}
+  favs=new Map(rows.map(r=>[fid(r.kind,r.key),r]));refreshFav();
 }
 
-/* ---------- auth ---------- */
+/* ---------- auth (Firebase, partagé avec les jeux) ---------- */
 let mode='in',synced=null;
 const AM=$('#authModal');
-const pseudo=()=>user?.user_metadata?.pseudo||(user?.email||'').split('@')[0];
+const pseudo=()=>user?(user.displayName||(user.email||'').split('@')[0]):'';
 function renderAcct(){$('#acctBtn').textContent=user?'★ '+pseudo():'Se connecter'}
 function setMode(m){mode=m;
-  $('#fPseudo').hidden=m!=='up';$('#fEmail').hidden=m==='newpass';$('#fPass').hidden=m==='reset';
-  $('#authTabs').hidden=m==='reset'||m==='newpass';$('#aForgot').hidden=m!=='in';
+  $('#fPseudo').hidden=m!=='up';$('#fPass').hidden=m==='reset';
+  $('#authTabs').hidden=m==='reset';$('#aForgot').hidden=m!=='in';
   $('#aPass').autocomplete=m==='in'?'current-password':'new-password';
-  $('#authTitle').textContent={in:'Connexion',up:'Créer un compte',reset:'Mot de passe oublié',newpass:'Nouveau mot de passe'}[m];
-  $('#aSubmit').textContent={in:'Se connecter',up:'Créer mon compte',reset:'Recevoir un lien',newpass:'Enregistrer'}[m];
+  $('#authTitle').textContent={in:'Connexion',up:'Créer un compte',reset:'Mot de passe oublié'}[m];
+  $('#aSubmit').textContent={in:'Se connecter',up:'Créer mon compte',reset:'Recevoir un lien'}[m];
   $$('#authTabs [data-am]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.am===m));$('#aErr').textContent='';$('#aErr').className='err'}
-function openAuth(m){if(!sb){toast('Connexion indisponible pour le moment');return}setMode(m||'in');AM.showModal();setTimeout(()=>(m==='up'?$('#aPseudo'):$('#aEmail')).focus(),50)}
-const frErr=e=>{const m=(e&&e.message)||'';if(/Invalid login/i.test(m))return'Email ou mot de passe incorrect.';if(/not confirmed/i.test(m))return'Confirmez d’abord votre adresse en cliquant sur le lien reçu par email.';if(/already registered|already been registered/i.test(m))return'Un compte existe déjà avec cet email : connectez-vous.';if(/at least 6/i.test(m))return'Le mot de passe doit faire au moins 6 caractères.';if(/rate limit|too many/i.test(m))return'Trop de tentatives : réessayez dans quelques minutes.';if(/valid email|invalid.*email/i.test(m))return'Adresse email invalide.';return m||'Une erreur est survenue.'};
+function openAuth(m){if(!auth){toast('Connexion indisponible pour le moment');return}setMode(m||'in');AM.showModal();setTimeout(()=>(m==='up'?$('#aPseudo'):$('#aEmail')).focus(),50)}
+const frErr=e=>{const c=String(e&&e.code||''),m=String(e&&e.message||'');
+  if(/invalid-credential|wrong-password|user-not-found|invalid-login/.test(c))return'Email ou mot de passe incorrect.';
+  if(/email-already-in-use/.test(c))return'Un compte existe déjà avec cet email (peut-être créé dans un jeu Bip) : connectez-vous.';
+  if(/weak-password/.test(c))return'Le mot de passe doit faire au moins 6 caractères.';
+  if(/invalid-email|missing-email/.test(c))return'Adresse email invalide.';
+  if(/too-many-requests/.test(c))return'Trop de tentatives : réessayez dans quelques minutes.';
+  if(/network-request-failed/.test(c))return'Impossible de joindre le serveur : vérifiez votre connexion.';
+  if(/unauthorized-domain/.test(c))return'Ce site n\u2019est pas autorisé à se connecter : prévenez votre formateur.';
+  return'Erreur : '+(c||m)};
 $('#authTabs').addEventListener('click',e=>{const b=e.target.closest('[data-am]');if(b)setMode(b.dataset.am)});
 $('#aForgot').onclick=()=>setMode('reset');
 $('#authForm').addEventListener('submit',async e=>{
   e.preventDefault();const em=$('#aEmail').value.trim(),pw=$('#aPass').value,err=$('#aErr');err.className='err';err.textContent='';
-  if(mode!=='newpass'&&!/^\S+@\S+\.\S+$/.test(em)){err.textContent='Entrez une adresse email valide.';return}
-  if((mode==='in'||mode==='up'||mode==='newpass')&&pw.length<6){err.textContent='Le mot de passe doit faire au moins 6 caractères.';return}
+  if(!/^\S+@\S+\.\S+$/.test(em)){err.textContent='Entrez une adresse email valide.';return}
+  if(mode!=='reset'&&pw.length<6){err.textContent='Le mot de passe doit faire au moins 6 caractères.';return}
   const btn=$('#aSubmit');btn.disabled=true;const old=btn.textContent;btn.textContent='Un instant…';
   try{
-    if(mode==='in'){const {error}=await sb.auth.signInWithPassword({email:em,password:pw});if(error)throw error;AM.close();toast('Bienvenue '+pseudo()+' !')}
-    else if(mode==='up'){const ps=$('#aPseudo').value.trim();const {data,error}=await sb.auth.signUp({email:em,password:pw,options:{data:{pseudo:ps},emailRedirectTo:location.origin+location.pathname}});if(error)throw error;
-      if(data.session){AM.close();toast('Compte créé, bienvenue '+(ps||'')+' !')}else{err.className='ok';err.textContent='Presque fini : ouvrez l’email de confirmation que nous venons d’envoyer, puis connectez-vous.'}}
-    else if(mode==='reset'){const {error}=await sb.auth.resetPasswordForEmail(em,{redirectTo:location.origin+location.pathname});if(error)throw error;err.className='ok';err.textContent='Si un compte existe, un lien de réinitialisation vient de partir.'}
-    else{const {error}=await sb.auth.updateUser({password:pw});if(error)throw error;AM.close();toast('Mot de passe modifié ✓')}
+    if(mode==='in'){await auth.signInWithEmailAndPassword(em,pw);AM.close();toast('Bienvenue '+pseudo()+' !')}
+    else if(mode==='up'){const ps=$('#aPseudo').value.trim();const cred=await auth.createUserWithEmailAndPassword(em,pw);if(ps){await cred.user.updateProfile({displayName:ps});renderAcct()}AM.close();toast('Compte créé, bienvenue '+(ps||'')+' ! Il marche aussi dans les jeux Bip.')}
+    else{await auth.sendPasswordResetEmail(em);err.className='ok';err.textContent='Si un compte existe, un lien de réinitialisation vient de partir.'}
   }catch(x){err.textContent=frErr(x)}finally{btn.disabled=false;btn.textContent=old}
 });
-async function afterAuth(){
-  const id=user?.id||'anon';if(synced===id)return;synced=id;
-  if(user){const local=store.get(LOCAL,[]);if(local.length){const {error}=await sb.from('favorites').upsert(local.map(r=>({kind:r.kind,key:r.key,label:r.label,data:r.data||{},user_id:user.id})),{onConflict:'user_id,kind,key',ignoreDuplicates:true});if(!error){store.del(LOCAL);toast(local.length+' favori'+(local.length>1?'s':'')+' de cet appareil ajouté'+(local.length>1?'s':'')+' à votre compte')}}}
-  await loadFavs();renderAcct();
-}
-if(sb){
-  sb.auth.onAuthStateChange((ev,session)=>{user=session?.user||null;renderAcct();
-    if(ev==='PASSWORD_RECOVERY')setTimeout(()=>openAuth('newpass'),0);
-    setTimeout(afterAuth,0)});
-}else loadFavs();
+async function afterAuth(){const id=user?user.uid:'anon';if(synced===id)return;synced=id;await loadFavs();renderAcct();if(current==='espace')renderEspace()}
+if(auth){auth.onAuthStateChanged(u=>{user=u||null;renderAcct();afterAuth()})}else loadFavs();
 $('#acctBtn').onclick=()=>{if(user)location.hash='#espace';else openAuth('in')};
 
 /* ---------- global clicks ---------- */
@@ -426,14 +426,21 @@ onShow.code=()=>{
 /* ---------- mon espace ---------- */
 const KINDS=[['artist','Artistes'],['palette','Palettes'],['color','Couleurs'],['font','Polices'],['pair','Associations de polices'],['term','Vocabulaire et symboles'],['gabarit','Gabarits d’affiche'],['logo','Familles de logos'],['resource','Références']];
 function renderEspace(){const rows=[...favs.values()];rows.forEach(r=>REG.set(fid(r.kind,r.key),r));
-  let h=user?`<div class="hero-acct"><div><span class="eyebrow" style="color:#bbb">Mon espace</span><h1 style="margin-top:6px">Bonjour ${esc(pseudo())}</h1><p style="margin:8px 0 0;color:#ccc">${esc(user.email)} · ${rows.length} favori${rows.length>1?'s':''} synchronisé${rows.length>1?'s':''} sur tous vos appareils.</p></div><div class="seg"><button class="btn" id="logout">Se déconnecter</button></div></div>`
+  let h=user?`<div class="hero-acct"><div><span class="eyebrow" style="color:#bbb">Mon espace</span><h1 style="margin-top:6px">Bonjour ${esc(pseudo())}</h1><p style="margin:8px 0 0;color:#ccc">${esc(user.email)} · ${rows.length} favori${rows.length>1?'s':''} · le même compte que Mission Bip et Bip Agence.</p></div><div class="seg"><button class="btn" id="logout">Se déconnecter</button></div></div>`
   :`<div class="hero-acct"><div><h1>Mon espace</h1><p style="margin:8px 0 0;color:#ccc">Créez un compte gratuit pour garder vos artistes, palettes, polices et mots préférés, et les retrouver sur tous vos appareils, même après la formation.${rows.length?(rows.length>1?` Les ${rows.length} favoris de cet appareil seront ajoutés à votre compte.`:' Le favori de cet appareil sera ajouté à votre compte.'):''}</p></div><div class="seg"><button class="btn" data-open-auth="up">Créer un compte</button><button class="btn" data-open-auth="in">Se connecter</button></div></div>`;
   if(!rows.length)h+=`<div class="empty" style="margin-top:24px"><b>Rien ici pour l'instant.</b> Cliquez ☆ sur un artiste, une couleur, une police, un mot du lexique ou une référence ; enregistrez une palette depuis l'onglet Couleurs ou Outils.</div>`;
   for(const [k,n] of KINDS){const l=rows.filter(r=>r.kind===k);if(!l.length)continue;h+=`<div class="sec rule"><h3>${n} <span class="count">${l.length}</span></h3>${espaceGroup(k,l)}</div>`}
   if(rows.some(r=>r.kind==='palette'))h+=`<p style="margin-top:16px"><button class="btn" id="allPal">Copier toutes mes palettes en CSS</button></p>`;
-  $('#espace').innerHTML=h;
-  const lo=$('#logout');if(lo)lo.onclick=async()=>{await sb.auth.signOut();toast('Déconnecté')};
+  if(user)h+=`<div class="sec rule"><h3>Mes jeux de code</h3><div class="games" id="myGames"><p class="small"><span class="spin"></span>Chargement de ta progression…</p></div></div>`;
+  $('#espace').innerHTML=h;if(user)loadGames();
+  const lo=$('#logout');if(lo)lo.onclick=async()=>{await auth.signOut();toast('Déconnecté')};
   const ap=$('#allPal');if(ap)ap.onclick=()=>copy(rows.filter(r=>r.kind==='palette').map(r=>`/* ${r.label} */\n`+cssVars(r.data.colors||[])).join('\n\n'),'Palettes copiées')}
+async function loadGames(){const box=$('#myGames');if(!box)return;
+  const G2=[["mission-bip","Mission Bip",22,"https://diurndesign.github.io/javascript_game/","#ffc400"],["bip-agence","Bip Agence",52,"https://diurndesign.github.io/javascript_avance/","#1f3fd1"]];
+  const out=await Promise.all(G2.map(async g=>{let d=null;try{const s=await db.collection('eleves').doc(user.uid).collection('jeux').doc(g[0]).get();if(s.exists)d=JSON.parse(s.data().data||'{}')}catch(e){}
+    const p=(d&&d.progress)||{},done=Object.keys(p).length,stars=Object.values(p).reduce((t,v)=>t+(v&&v.stars||0),0),pct=Math.min(100,Math.round(done/g[2]*100));
+    return `<div class="panel" style="background:var(--bg);border:2px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="font-size:20px">${g[1]}</b><span class="small">${stars} ★</span></div><p style="margin:8px 0 6px">${d?`<b>${done}</b> mission${done>1?'s':''} réussie${done>1?'s':''} sur ${g[2]}`:'Pas encore commencé'}</p><div style="height:10px;border-radius:99px;background:var(--panel);overflow:hidden"><i style="display:block;height:100%;width:${pct}%;background:${g[4]}"></i></div><p style="margin-top:12px"><a class="btn sm solid" href="${g[3]}" target="_blank" rel="noopener">${d?'Continuer':'Commencer'} ↗</a></p></div>`}));
+  if($('#myGames'))$('#myGames').innerHTML=out.join('')}
 function espaceGroup(k,l){const del=r=>favBtn(r.kind,r.key,r.label,r.data,true);
   if(k==='artist')return `<div class="agrid">${l.map(r=>BYID.get(r.key)).filter(Boolean).map(acard).join('')}</div>`;
   if(k==='palette')return `<div class="grid3">${l.map(r=>{const c=r.data.colors||[];return `<div class="panel" style="background:var(--bg);border:2px solid var(--line)"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>${esc(r.label)}</b>${del(r)}</div><div class="mine-pal">${c.map(x=>`<i style="background:${esc(x)}" data-copy="${esc(x)}" data-copy-label="${esc(x)} copié" title="${esc(x)}"></i>`).join('')}</div><p class="small" style="margin:0 0 8px">${c.map(esc).join(' · ')}</p><button class="btn sm" data-copy="${esc(cssVars(c))}" data-copy-label="Variables CSS copiées">Copier en CSS</button></div>`}).join('')}</div>`;
@@ -449,5 +456,5 @@ onShow.espace=renderEspace;
 
 /* ---------- start ---------- */
 renderDay();route();
-if(!sb)renderAcct();
+if(!auth)renderAcct();
 })();

@@ -2,32 +2,29 @@
 
 Site statique (HTML, CSS, JS, sans build) + Supabase pour les comptes et les favoris.
 
-## Mettre en ligne (Vercel, 1 minute)
+## En ligne
 
-Dans ce dossier :
+GitHub Pages : https://diurndesign.github.io/atelier/ (chaque push sur `main` met le site à jour).
+
+## Comptes : le même que les jeux Bip
+
+Atelier utilise le projet Firebase **bip-jeux**, comme Mission Bip et Bip Agence.
+Un élève a donc un seul compte (email + mot de passe) pour les trois sites, et comme
+ils sont tous sur `diurndesign.github.io`, se connecter sur l'un connecte sur les autres.
+
+- Favoris : `eleves/{uid}/atelier/favoris` (une chaîne JSON, comme la sauvegarde des jeux)
+- « Mon espace » lit aussi `eleves/{uid}/jeux/mission-bip` et `bip-agence` pour afficher la progression
+
+Règle Firestore à ajouter (déjà incluse dans les règles proposées par la page admin des jeux) :
 
 ```
-npx vercel --prod
+match /eleves/{uid}/atelier/{doc} {
+  allow read, write: if request.auth != null && request.auth.uid == uid;
+  allow read: if estFormateur();
+}
 ```
 
-Réponds aux questions : nouveau projet, nom `atelier` (ou autre), aucun framework, pas de build.
-Vercel donne l'adresse du site, par exemple `https://atelier-xxx.vercel.app`.
-
-## Régler Supabase (projet « atelier », déjà créé)
-
-Dans le tableau de bord Supabase, projet **atelier** :
-
-1. **Authentication → URL Configuration**
-   - Site URL : l'adresse Vercel du site
-   - Redirect URLs : ajouter la même adresse
-   Sans ce réglage, le lien de l'email de confirmation renvoie vers `localhost`.
-2. **Authentication → Sign In / Providers → Email**
-   - Pour une classe qui s'inscrit en même temps, désactiver « Confirm email »,
-     ou configurer un SMTP (Brevo, Resend…) : le service d'email intégré de Supabase
-     n'envoie que très peu d'emails par heure.
-
-La base contient une seule table, `favorites`, protégée par RLS :
-chaque utilisateur ne lit et n'écrit que ses propres favoris.
+Sans compte, les favoris restent dans le navigateur et sont ajoutés au compte à la connexion.
 
 ## Fichiers
 
