@@ -311,3 +311,55 @@ PEI.push(
 ART.push(
 ["Auguste Rodin","1840–1917","France","Sculpture","Il libère la sculpture du lisse académique et garde la trace du modelage.","Le Penseur|1880–1904;La Porte de l'Enfer|1880–1917","Le non-fini peut être expressif."],
 ["Camille Claudel","1864–1943","France","Sculpture","Sculptrice de génie, longtemps éclipsée par Rodin, au modelé d'une grande sensibilité.","La Valse|1889–1905;L'Âge mûr|1899","Sortir de l'ombre de son maître."]);
+
+const UX=[
+["Douglas Engelbart","1925–2013","États-Unis","Pionnier de l'interface","Il invente la souris et présente en 1968 l'hypertexte, le fenêtrage et la visioconférence.","The Mother of All Demos|1968;Souris|1964","Imaginer l'outil avant qu'il existe."],
+["Ivan Sutherland","né en 1938","États-Unis","Pionnier de l'interface","Son programme Sketchpad permet de dessiner à l'écran avec un stylet : la première interface graphique.","Sketchpad|1963","Dessiner directement sur l'écran."],
+["Alan Kay","né en 1940","États-Unis","Xerox PARC","Chercheur au Xerox PARC, il imagine l'ordinateur personnel pour enfants et les interfaces à fenêtres.","Dynabook (concept)|1972;Smalltalk|années 1970","Penser l'ordinateur pour apprendre."],
+["Larry Tesler","1945–2020","États-Unis","Interaction","Il popularise le couper, copier, coller et défend des interfaces sans modes.","Éditeur Gypsy|1975","Une interface sans modes est plus simple."],
+["Jef Raskin","1943–2005","États-Unis","Interface humaine","Il lance le projet Macintosh chez Apple et théorise des interfaces centrées sur l'humain.","The Humane Interface (livre)|2000","L'interface doit s'adapter à l'humain."],
+["Susan Kare","née en 1954","États-Unis","Icônes & pixel art","Elle dessine les icônes et les polices du premier Macintosh, pixel par pixel.","Icônes du Macintosh|1984;Police Chicago|1984","Une icône claire en 32 × 32 pixels."],
+["Bill Atkinson","1951–2025","États-Unis","Logiciel graphique","Il crée MacPaint et HyperCard, ancêtre des liens hypertextes du web.","MacPaint|1984;HyperCard|1987","Un outil peut ouvrir la création à tous."],
+["Don Norman","né en 1935","États-Unis","UX","Psychologue, il popularise l'expression « expérience utilisateur » ; ses « portes de Norman » ne disent pas si on pousse ou on tire.","The Design of Everyday Things (livre)|1988","Si on se trompe, c'est la faute du design."],
+["Jakob Nielsen","né en 1957","Danemark / États-Unis","Utilisabilité","Il formule les 10 heuristiques d'utilisabilité, encore utilisées pour évaluer les interfaces.","10 heuristiques d'utilisabilité|1994","Tester avec cinq utilisateurs révèle l'essentiel."],
+["Ben Shneiderman","né en 1947","États-Unis","Interaction & data","Il théorise la manipulation directe et le mantra de la visualisation : vue d'ensemble, zoom, détails.","Manipulation directe|1983;Mantra de la visualisation|1996","Vue d'ensemble d'abord, détails ensuite."],
+["Alan Cooper","né en 1952","États-Unis","Design d'interaction","Il invente les personas pour concevoir en pensant à de vrais utilisateurs.","About Face (livre)|1995;Personas|1999","Concevoir pour quelqu'un, pas pour tout le monde."],
+["Steve Krug","actif depuis les années 1990","États-Unis","Utilisabilité","Son livre court et drôle est la bible de l'utilisabilité web.","Don't Make Me Think (livre)|2000","Ne pas faire réfléchir l'utilisateur."],
+["Jesse James Garrett","actif depuis les années 1990","États-Unis","Architecture UX","Il décrit les cinq plans de l'expérience utilisateur, de la stratégie à la surface.","The Elements of User Experience (livre)|2002","L'UX se construit par couches."],
+["Jeffrey Zeldman","actif depuis les années 1990","États-Unis","Standards du web","Il défend un web construit sur les standards HTML et CSS.","Designing with Web Standards (livre)|2003","Des bases propres rendent tout possible."],
+["Ethan Marcotte","actif depuis les années 2000","États-Unis","Responsive design","Il invente le terme « responsive web design » dans un article fondateur.","Responsive Web Design (article)|2010","Un seul site pour tous les écrans."],
+["Luke Wroblewski","actif depuis les années 2000","États-Unis","Mobile first","Il théorise la conception mobile d'abord : l'essentiel avant tout.","Mobile First (livre)|2011","Le petit écran force à choisir l'essentiel."],
+["Brad Frost","actif depuis les années 2010","États-Unis","Design system","Il compare les interfaces à la chimie : atomes, molécules, organismes.","Atomic Design (livre)|2016","Construire du petit vers le grand."],
+["Dan Saffer","actif depuis les années 2000","États-Unis","Micro-interactions","Il étudie les petits moments d'une interface : un bouton, un interrupteur, une notification.","Microinteractions (livre)|2013","Le détail fait l'expérience."],
+["Aarron Walter","actif depuis les années 2000","États-Unis","Design émotionnel","Ancien designer de Mailchimp, il montre que la personnalité rend un produit mémorable.","Designing for Emotion (livre)|2011","Une interface peut avoir de l'humour."],
+["Kat Holmes","active depuis les années 2000","États-Unis","Design inclusif","Elle montre qu'on conçoit mieux pour tous en partant des personnes exclues.","Mismatch (livre)|2018","Concevoir pour l'exclusion profite à tous."],
+["Erika Hall","active depuis les années 2000","États-Unis","Recherche utilisateur","Elle rend la recherche utilisateur accessible aux petites équipes.","Just Enough Research (livre)|2013","Un peu de recherche vaut mieux que des suppositions."],
+["Bret Victor","actif depuis les années 2000","États-Unis","Interfaces créatives","Ses conférences imaginent des outils où l'on voit immédiatement l'effet de ce que l'on fait.","Inventing on Principle (conférence)|2012","Le créateur doit voir ce qu'il crée en direct."],
+["Loren Brichter","actif depuis les années 2000","États-Unis","Interaction mobile","Il invente le geste « tirer pour rafraîchir », repris par presque toutes les applis.","Tweetie (pull-to-refresh)|2008","Un geste naturel devient un standard."],
+["Matías Duarte","né en 1973","Chili / États-Unis","Design system","Il dirige chez Google la création de Material Design, un langage visuel pour Android et le web.","Material Design|2014","Un système partagé rend tout cohérent."],
+["Dylan Field","né en 1992","États-Unis","Outils de design","Cofondateur de Figma, il fait du design d'interface une activité collaborative dans le navigateur.","Figma|2016","Concevoir ensemble, en temps réel."]];
+CATS.push({k:"ux",n:"UI / UX",c:"#00a3ff",on:"#111111",list:UX,q:"user interface"});
+
+/* Onglet Code */
+const GAMES=[
+["Mission Bip","https://diurndesign.github.io/javascript_game/","https://github.com/Diurndesign/javascript_game","Débutant","Bip est un robot à réparer. 22 missions pour apprendre les bases en écrivant du vrai code : console.log, variables, tableaux, objets, fonctions, conditions, forEach, filter et DOM.","Console expliquée en français, mémoire des variables, mini page à modifier, carnet et bac à sable.","#ffc400"],
+["Bip Agence","https://diurndesign.github.io/javascript_avance/","https://github.com/Diurndesign/javascript_avance","Suite","Stagiaire dans une agence web, l'élève réalise 52 missions pour de vrais types de clients : site vitrine, appli, boutique, formulaire.","Formations « Le chemin des données » et « Les accolades », schémas, mode pas à pas, projet portfolio bonus.","#1f3fd1"]];
+const SNIPS=[
+["Centrer n'importe quoi","CSS",".parent {\n  display: grid;\n  place-items: center;\n}"],
+["Grille responsive sans media query","CSS",".grille {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));\n  gap: 24px;\n}"],
+["Titre fluide","CSS","h1 {\n  font-size: clamp(2rem, 5vw, 4rem);\n  line-height: 1.05;\n}"],
+["Variables de couleur","CSS",":root {\n  --couleur-fond: #ffffff;\n  --couleur-texte: #111111;\n  --couleur-accent: #e4002b;\n}\nbody {\n  background: var(--couleur-fond);\n  color: var(--couleur-texte);\n}"],
+["Mode sombre automatique","CSS","@media (prefers-color-scheme: dark) {\n  :root {\n    --couleur-fond: #111111;\n    --couleur-texte: #f1f1f1;\n  }\n}"],
+["Image qui remplit son cadre","CSS",".vignette img {\n  width: 100%;\n  aspect-ratio: 4 / 3;\n  object-fit: cover;\n}"],
+["Squelette HTML de base","HTML","<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <title>Mon projet</title>\n  <link rel=\"stylesheet\" href=\"style.css\">\n</head>\n<body>\n  <script src=\"script.js\" defer></script>\n</body>\n</html>"],
+["Menu burger","JS","const bouton = document.querySelector('.burger');\nconst menu = document.querySelector('.menu');\n\nbouton.addEventListener('click', () => {\n  menu.classList.toggle('ouvert');\n  const ouvert = menu.classList.contains('ouvert');\n  bouton.setAttribute('aria-expanded', ouvert);\n});"],
+["Filtrer une galerie","JS","const boutons = document.querySelectorAll('[data-filtre]');\nconst cartes = document.querySelectorAll('.carte');\n\nboutons.forEach(bouton => {\n  bouton.addEventListener('click', () => {\n    const filtre = bouton.dataset.filtre;\n    cartes.forEach(carte => {\n      carte.hidden = filtre !== 'tout' && carte.dataset.categorie !== filtre;\n    });\n  });\n});"]];
+const LEARN=[
+["Flexbox Froggy","https://flexboxfroggy.com/#fr","Apprendre Flexbox en aidant des grenouilles."],
+["Grid Garden","https://cssgridgarden.com/#fr","Apprendre CSS Grid en arrosant un potager."],
+["CSS Diner","https://flukeout.github.io/","Apprendre les sélecteurs CSS en jouant."],
+["MDN Web Docs","https://developer.mozilla.org/fr/","La documentation de référence du web, en français."],
+["JavaScript.info","https://fr.javascript.info/","Le tutoriel JavaScript moderne, complet et gratuit."],
+["Can I use","https://caniuse.com/","Vérifier qu'une propriété marche dans tous les navigateurs."],
+["Frontend Mentor","https://www.frontendmentor.io/","Des maquettes réelles à intégrer, du plus simple au plus dur."],
+["CodePen","https://codepen.io","Tester et partager du HTML, CSS et JS en ligne."]];

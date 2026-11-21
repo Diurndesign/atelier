@@ -102,7 +102,7 @@ document.addEventListener('click',e=>{
 $$('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d)d.close()}));
 
 /* ---------- router ---------- */
-const TABS=['aujourdhui','artistes','couleurs','symbolique','composition','logos','typo','lexique','outils','references','espace'];
+const TABS=['aujourdhui','artistes','couleurs','symbolique','composition','logos','typo','lexique','outils','code','references','espace'];
 const onShow={};
 function route(){let t=location.hash.slice(1);if(!TABS.includes(t))t='aujourdhui';current=t;
   $$('.tab').forEach(s=>s.hidden=s.id!=='t-'+t);
@@ -137,7 +137,7 @@ $('#prev').onclick=()=>{off--;renderDay()};$('#next').onclick=()=>{off++;renderD
 document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('.art[data-open-artist]')){e.preventDefault();openArtist(e.target.dataset.openArtist)}});
 
 /* artist modal + Wikimedia Commons */
-const CQ={web:'digital art',gra:'poster',art:'artwork',des:'design',pei:'painting',pho:'photograph',arc:'building',ill:'illustration',mod:'fashion'};
+const CQ={web:'digital art',gra:'poster',art:'artwork',des:'design',pei:'painting',pho:'photograph',arc:'building',ill:'illustration',mod:'fashion',ux:'user interface'};
 const BAD=/portrait|porträt|retrato|ritratto|interview|conference|conférence|lecture|award|ceremony|cérémonie|press |selfie|headshot|signature|grave|tomb|tombe|speaking|book signing|meeting|visite officielle|in \d{4}\b|en \d{4}\b|\(\d{4}\)$/i;
 const stripTags=h=>{const d=document.createElement('div');d.innerHTML=h||'';return (d.textContent||'').replace(/\s+/g,' ').trim()};
 let galTok=0;
@@ -404,6 +404,14 @@ $('#refnav').addEventListener('click',e=>{const b=e.target.closest('[data-ref]')
 const refCard=r=>`<article class="ref"><a class="n" href="${r[1]}" target="_blank" rel="noopener">${r[0]} ↗</a><p style="margin:0;font-size:15px">${r[2]}</p>${r[3]?`<p class="tip" style="margin:0">${r[3]}</p>`:''}<div class="acts">${favBtn('resource',r[1],r[0],{name:r[0],url:r[1],desc:r[2]},false)}</div></article>`;
 onShow.references=()=>{$('#refs').innerHTML=RES.map((g,i)=>`<div class="sec rule" id="rg${i}" style="${i?'':'margin-top:0'}"><h3>${g[0]}</h3><div class="refs">${g[1].map(refCard).join('')}</div></div>`).join('')};
 
+/* ---------- code ---------- */
+const bip=c=>`<svg viewBox="0 0 96 96" aria-hidden="true"><line x1="48" y1="6" x2="48" y2="20" stroke="#111" stroke-width="4"/><circle cx="48" cy="6" r="5" fill="#e4002b"/><rect x="18" y="20" width="60" height="46" rx="12" fill="#fff" stroke="#111" stroke-width="4"/><circle cx="36" cy="42" r="7" fill="#111"/><circle cx="60" cy="42" r="7" fill="#111"/><rect x="36" y="54" width="24" height="5" rx="2.5" fill="${c}"/><rect x="28" y="70" width="40" height="20" rx="6" fill="#111"/></svg>`;
+let codeInit=false;
+onShow.code=()=>{
+  $('#games').innerHTML=GAMES.map(g=>`<article class="game"><div class="scr" style="--g:${g[6]};color:${g[6]==='#ffc400'?'#111':'#fff'}">${bip(g[6]==='#ffc400'?'#1f3fd1':'#ffc400')}<div><b>${g[0]}</b><br><span>${g[3]}</span></div></div><div class="in"><p style="font-size:17px;margin:0">${g[4]}</p><p class="small" style="margin:0">${g[5]}</p><div class="acts"><a class="btn solid" href="${g[1]}" target="_blank" rel="noopener">Jouer ↗</a><a class="btn sm" href="${g[2]}" target="_blank" rel="noopener">Code source ↗</a>${favBtn('resource',g[1],g[0],{name:g[0],url:g[1],desc:g[4]},true)}</div></div></article>`).join('');
+  $('#snips').innerHTML=SNIPS.map(s=>`<div class="snip"><h4>${esc(s[0])} <span class="lang">${s[1]}</span></h4><pre><code>${esc(s[2])}</code></pre><button class="btn sm" data-copy="${esc(s[2])}" data-copy-label="Code copié">Copier</button></div>`).join('');
+  $('#learn').innerHTML=LEARN.map(l=>refCard([l[0],l[1],l[2],''])).join('')};
+
 /* ---------- mon espace ---------- */
 const KINDS=[['artist','Artistes'],['palette','Palettes'],['color','Couleurs'],['font','Polices'],['pair','Associations de polices'],['term','Mots à réviser'],['gabarit','Gabarits d’affiche'],['logo','Familles de logos'],['resource','Références']];
 function renderEspace(){const rows=[...favs.values()];rows.forEach(r=>REG.set(fid(r.kind,r.key),r));
@@ -424,7 +432,7 @@ function espaceGroup(k,l){const del=r=>favBtn(r.kind,r.key,r.label,r.data,true);
   if(k==='term')return `<dl class="lexgrid">${l.map(r=>LEX.find(t=>t[0]===r.key)).filter(Boolean).map(t=>`<div class="term"><dt>${t[0]}<span>${t[1]}</span></dt><dd>${t[2]}</dd>${favBtn('term',t[0],t[0],{},true)}</div>`).join('')}</dl>`;
   if(k==='gabarit')return `<div class="gab show-grid show-read">${l.map(r=>G.find(g=>g[0]===r.key)).filter(Boolean).map(g=>`<article>${gabSvg(g)}<div><h4 style="display:flex;justify-content:space-between;gap:8px">${g[0]} ${favBtn('gabarit',g[0],g[0],{},true)}</h4><p class="small">${g[5]}</p></div></article>`).join('')}</div>`;
   if(k==='logo')return `<div class="seg">${l.map(r=>`<span class="panel" style="padding:8px 14px;display:inline-flex;gap:10px;align-items:center"><b>${esc(r.key)}</b>${del(r)}</span>`).join('')} <a class="btn sm" href="#logos">Voir les familles</a></div>`;
-  if(k==='resource')return `<div class="refs">${l.map(r=>{const f=RES.flatMap(g=>g[1]).find(x=>x[1]===r.key)||[r.data.name,r.key,r.data.desc||''];return refCard(f)}).join('')}</div>`;
+  if(k==='resource')return `<div class="refs">${l.map(r=>{const f=RES.flatMap(g=>g[1]).find(x=>x[1]===r.key)||[r.data.name,r.key,r.data.desc||'',''];return refCard(f)}).join('')}</div>`;
   return ''}
 onShow.espace=renderEspace;
 

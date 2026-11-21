@@ -275,6 +275,21 @@ dialog::backdrop{background:rgba(10,10,10,.6)}
 .ref .tip{font-size:14px;border-left:4px solid var(--yel);padding-left:10px;color:var(--ink)}
 .ref .acts{padding-top:4px}
 .refnav{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px}
+/* code */
+.games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.game{border:3px solid var(--ink);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg)}
+.game .scr{background:var(--g);color:#fff;padding:22px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center;min-height:150px}
+.game .scr svg{width:96px;height:96px}
+.game .scr b{font-size:clamp(28px,3.4vw,40px);font-weight:900;font-stretch:112%;line-height:1}
+.game .scr span{display:inline-block;margin-top:8px;background:#111;color:#fff;border-radius:99px;padding:3px 12px;font-weight:800;font-size:14px}
+.game .in{padding:18px 22px 22px;display:flex;flex-direction:column;gap:8px;flex:1}
+.snips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.snip{border:2px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
+.snip h4{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0}
+.snip pre{margin:0;flex:1;font-size:13px}
+.lang{font-size:12px;font-weight:800;padding:2px 8px;border-radius:99px;background:var(--panel)}
+@media (max-width:1000px){.snips{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:820px){.games,.snips{grid-template-columns:minmax(0,1fr)}}
 /* espace */
 .empty{border:2px dashed var(--line);border-radius:16px;padding:22px;color:var(--mute)}
 .mine-pal{display:flex;border-radius:10px;overflow:hidden;height:56px;margin:6px 0}
