@@ -27,6 +27,15 @@ function loadFont(n){if(!n||loaded.has(n))return;loaded.add(n);const l=document.
 
 /* ---------- favourites ---------- */
 let user=null,favs=new Map(),nudged=false,current='aujourdhui';
+const GROUPS=[["accueil","Aujourd'hui",[["aujourdhui","Aujourd'hui"]]],
+ ["culture","Culture",[["artistes","Artistes"],["symbolique","Symbolique"],["lexique","Lexique"]]],
+ ["bases","Bases du design",[["couleurs","Couleurs"],["typo","Typographie"],["composition","Composition"],["logos","Logos"]]],
+ ["uxui","UI / UX & web",[["uxui","UI / UX"],["code","Code & jeux"]]],
+ ["logiciels","Logiciels",[["logiciels","Logiciels"]]],
+ ["metier","Métier",[["methode","Méthode de projet"],["certifs","Certifications"],["references","Ressources"],["outils","Outils"]]],
+ ["espace","Mon espace",[["espace","Mon espace"]]]];
+const GOF={};GROUPS.forEach(g=>g[2].forEach(t=>GOF[t[0]]=g));
+$('#groups').innerHTML=GROUPS.map(g=>`<a href="#${g[2][0][0]}" data-g="${g[0]}">${g[1]}${g[0]==='espace'?' <span class="count" id="favCount">0</span>':''}</a>`).join('');
 const REG=new Map();
 const LOCAL='atelier-favs-v2';
 const fid=(k,key)=>k+'::'+key;
@@ -102,11 +111,13 @@ document.addEventListener('click',e=>{
 $$('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d)d.close()}));
 
 /* ---------- router ---------- */
-const TABS=['aujourdhui','artistes','couleurs','symbolique','composition','logos','typo','methode','logiciels','lexique','outils','code','references','espace'];
+const TABS=['aujourdhui','artistes','couleurs','symbolique','composition','logos','typo','methode','logiciels','uxui','certifs','lexique','outils','code','references','espace'];
 const onShow={};
-function route(){let t=location.hash.slice(1);if(!TABS.includes(t))t='aujourdhui';current=t;
+function route(){let t=location.hash.slice(1);if(!TABS.includes(t))t='aujourdhui';current=t;const g=GOF[t];
   $$('.tab').forEach(s=>s.hidden=s.id!=='t-'+t);
-  $$('nav.tabs a').forEach(a=>{const on=a.getAttribute('href')==='#'+t;if(on){a.setAttribute('aria-current','page');a.scrollIntoView({block:'nearest',inline:'nearest'})}else a.removeAttribute('aria-current')});
+  $$('#groups a').forEach(a=>{const on=a.dataset.g===g[0];if(on){a.setAttribute('aria-current','page');a.scrollIntoView({block:'nearest',inline:'nearest'})}else a.removeAttribute('aria-current')});
+  const sub=$('#subnav');sub.hidden=g[2].length<2;sub.innerHTML=g[2].map(x=>`<a href="#${x[0]}"${x[0]===t?' aria-current="page"':''}>${x[1]}</a>`).join('');
+  document.title=(t==='aujourdhui'?'':g[2].find(x=>x[0]===t)[1]+' · ')+'Atelier · boîte à outils du graphiste';
   window.scrollTo(0,0);if(onShow[t])onShow[t]();}
 window.addEventListener('hashchange',route);
 
@@ -445,7 +456,8 @@ $('#ckReset').onclick=()=>{store.del(CK);renderChecks()};
 $('#briefCopy').onclick=()=>copy(BRIEF.map((q,i)=>(i+1)+'. '+q).join('\n'),'Questions copiées');
 const row3=r=>`<tr><td data-l="${r===0?'':''}"><b>${r[0]}</b></td><td class="n">${r[1]}</td><td>${r[2]}</td></tr>`;
 let methInit=false;
-onShow.methode=()=>{
+let uxInit=false;
+function renderUxMoved(){
   $('#gestalt').innerHTML=GESTALT.map(g=>`<div class="forme"><svg viewBox="0 0 100 56" style="width:120px;height:68px;fill:none;stroke:none;color:var(--ink)" aria-hidden="true">${g[3]}</svg><h4>${g[0]} ${favBtn('term','Gestalt : '+g[0],'Gestalt : '+g[0],{},true)}</h4><p>${g[1]}</p><p class="small">${g[2]}</p></div>`).join('');
   $('#heur').innerHTML=HEUR.map((x,i)=>`<div class="num"><div class="top2"><b class="n">${i+1}</b>${favBtn('term','Heuristique : '+x[0],'Heuristique : '+x[0],{},true)}</div><h4>${x[0]}</h4><p>${x[1]}</p><p class="small"><b>Exemple : </b>${x[2]}</p></div>`).join('');
   $('#lois').innerHTML=LOIS.map(x=>`<div class="fig2"><h4 style="display:flex;justify-content:space-between;gap:8px;align-items:center">${x[0]} ${favBtn('term','Loi UX : '+x[0],'Loi UX : '+x[0],{},true)}</h4><p>${x[1]}</p><p class="small"><b>En pratique : </b>${x[2]}</p></div>`).join('');
@@ -453,6 +465,8 @@ onShow.methode=()=>{
   const EST=[["var(--ink)","var(--bg)",""],["var(--red)","#fff",""],["var(--ink)","var(--bg)","outline:3px solid var(--blue);outline-offset:3px"],["#000","#fff","transform:scale(.96)"],["var(--panel)","var(--mute)","border-color:var(--line)"],["var(--ink)","var(--bg)","opacity:.8"],["var(--bg)","var(--red)","border-color:var(--red)"],["#0a6b2f","#fff",""],["var(--bg)","var(--mute)","border:2px dashed var(--line)"]];
   const LBL=["Envoyer","Envoyer","Envoyer","Envoyer","Envoyer","Envoi…","Réessayer","✓ Envoyé","Aucun projet"];
   $('#etats').innerHTML=ETATS.map((x,i)=>`<div class="etat"><span class="demo-btn" style="background:${EST[i][0]};color:${EST[i][1]};${EST[i][2]}">${LBL[i]}</span><div><b>${x[0]}</b><p class="small" style="margin:2px 0 0">${x[1]}</p></div></div>`).join('');
+}
+onShow.methode=()=>{
   const tr=(r,l)=>`<tr><td data-l="${l[0]}"><b>${r[0]}</b></td><td data-l="${l[1]}" class="n">${r[1]}</td><td data-l="${l[2]}">${r[2]}</td></tr>`;
   $('#fSoc').innerHTML=FMT_SOCIAL.map(r=>tr(r,['Support','Taille','À savoir'])).join('');
   $('#fWeb').innerHTML=FMT_WEB.map(r=>tr(r,['Élément','Taille','À savoir'])).join('');
@@ -601,7 +615,7 @@ const tutoDesc=(u,soft)=>/youtube\.com\/results/.test(u)?[`Une recherche YouTube
   :/blackmagicdesign/.test(u)?['Les formations officielles gratuites de DaVinci Resolve, avec livres et fichiers d\'exercice.','']
   :[`Pour apprendre ${soft}.`,''];
 const tutoRow=(t,soft)=>{const d=tutoDesc(t[1],soft);return [t[0],t[1],d[0],d[1],t[2]]};
-function swPanel(s){return `<div class="sw-head" style="--c:${s.c}"><div><span class="eyebrow">${s.ed} · ${s.cat}</span><h3 class="sw-n">${s.n}</h3><p style="margin:6px 0 0;font-size:18px">${s.role}</p><p class="small" style="margin:8px 0 0"><b>À éviter pour : </b>${s.pas}</p></div></div>
+function swPanel(s){return `<div class="sw-head" style="--c:${s.c}"><div><span class="eyebrow">${s.ed} · ${s.cat}</span><h3 class="sw-n">${s.n}</h3><p style="margin:6px 0 0;font-size:18px">${s.role}</p><p class="small" style="margin:8px 0 0"><b>À éviter pour : </b>${s.pas}</p>${FREEALT[s.id]?`<p class="small" style="margin:6px 0 0"><b>Gratuit pour s'entraîner : </b>${FREEALT[s.id].map(a=>a[0]+(a[1]?` <i class="st">${a[1]}</i>`:'')).join(' · ')}</p>`:''}</div></div>
   <div class="sw-ui sec"><figure class="uifig">${uiSchema(s)}<figcaption class="small">Schéma simplifié de l'interface : la disposition exacte change selon la version et vos réglages.</figcaption></figure><div><h3 style="margin-bottom:10px">Repérez-vous</h3><ol class="uileg">${s.ui.map(z=>`<li>${z[0]}</li>`).join('')}</ol><p class="small" style="margin-top:12px">Perdu ? Menu <b>Fenêtre</b> pour rouvrir un panneau fermé${s.id==='fig'?'':', puis <b>Espace de travail › Réinitialiser</b> pour tout remettre en place'}.</p></div></div>
   <div class="sec rule"><h3 style="margin-bottom:6px">Les 6 notions à comprendre</h3><p class="lead" style="margin-bottom:16px">Comprenez ces idées et le reste du logiciel devient logique.</p><div class="concepts">${s.cles.map(k=>`<div class="concept"><div class="ill">${ill(k[2])}</div><h4>${k[0]}</h4><p>${k[1]}</p></div>`).join('')}</div></div>
   <div class="grid2 sec"><div class="rule"><h3 style="margin-bottom:10px">Pour bien commencer</h3><ol class="qbrief">${s.debut.map(x=>`<li>${x}</li>`).join('')}</ol></div><div class="rule"><h3 style="margin-bottom:10px">Les erreurs de débutant</h3><ul class="errs">${s.err.map(x=>`<li>${x}</li>`).join('')}</ul></div></div>
@@ -628,6 +642,52 @@ $('#lgOs').addEventListener('click',e=>{const b=e.target.closest('[data-os]');if
   $$('[data-keys]').forEach(el=>{const s=SOFT.find(x=>x.id===el.dataset.keys);if(s)el.innerHTML=keyList(s.rac)});
   $$('[data-keys2]').forEach(el=>el.innerHTML=keyList(SOFT2[+el.dataset.keys2][5]))});
 $('#lgPanel').addEventListener('click',e=>{const b=e.target.closest('[data-kcopy]');if(!b)return;const s=SOFT.find(x=>x.id===b.dataset.kcopy);copy(plainKeys(s.n,s.rac),'Raccourcis copiés')});
+
+
+/* ---------- illustrations UI / UX ---------- */
+Object.assign(ILL,{
+persona:()=>`<rect x="14" y="8" width="132" height="84" rx="8" fill="#fff" stroke="${INK}" stroke-width="1.2"/><circle cx="40" cy="34" r="14" fill="${YEL}"/><circle cx="40" cy="30" r="5.5" fill="#111"/><path d="M30 44a10 9 0 0 1 20 0" fill="#111"/><rect x="62" y="22" width="56" height="7" rx="2" fill="#111"/><rect x="62" y="33" width="40" height="4" rx="2" fill="#111" opacity=".4"/><text x="22" y="64" font-size="7" font-weight="800" fill="#0a6b2f" font-family="Archivo,sans-serif">Objectif</text>${lines(56,60,80,2,5,.7,'#111',.3)}<text x="22" y="82" font-size="7" font-weight="800" fill="#e4002b" font-family="Archivo,sans-serif">Frustration</text>${lines(66,78,70,2,5,.6,'#111',.3)}`,
+journey:()=>{const P=[[18,60],[48,30],[80,74],[112,40],[142,22]];return `<line x1="10" y1="50" x2="150" y2="50" stroke="${LN}" stroke-dasharray="3 3"/><path d="M18 60C34 60 34 30 48 30S66 74 80 74 98 40 112 40 130 22 142 22" fill="none" stroke="${BLU}" stroke-width="2.4"/>${P.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="5" fill="${p[1]<50?'#0a6b2f':RED}" stroke="#fff" stroke-width="1.5"/>`).join('')}${['Trouve','Compare','Paie','Reçoit','Revient'].map((t,i)=>`<text x="${P[i][0]}" y="94" text-anchor="middle" font-size="6.5" font-weight="700" fill="${INK}" font-family="Archivo,sans-serif">${t}</text>`).join('')}`+T(64,12,'Point de friction',`fill="${RED}"`)+`<path d="M80 15V66" stroke="${RED}" stroke-dasharray="2 2"/>`},
+tree:()=>{const box=(x,y,w,t,f)=>`<rect x="${x}" y="${y}" width="${w}" height="14" rx="3" fill="${f||'#fff'}" stroke="${INK}"/><text x="${x+w/2}" y="${y+9.5}" text-anchor="middle" font-size="6.5" font-weight="700" fill="${f?'#fff':'#111'}" font-family="Archivo,sans-serif">${t}</text>`;
+  return `<path d="M80 22V32M30 32H130M30 32V40M80 32V40M130 32V40M30 54V62M14 62H46M14 62V68M46 62V68M130 54V68" fill="none" stroke="${INK}"/>`+box(56,8,48,'Accueil',BLU)+box(10,40,40,'Projets')+box(60,40,40,'À propos')+box(110,40,40,'Contact')+box(0,68,28,'Affiche')+box(32,68,28,'Logo')+box(112,68,36,'Formulaire')},
+wire:()=>`${phone(52,6,56,88)}<rect x="58" y="12" width="44" height="7" rx="1" fill="#ccc"/><rect x="58" y="24" width="44" height="26" fill="none" stroke="#999"/><path d="M58 24L102 50M102 24L58 50" stroke="#999" stroke-width=".8"/>${lines(58,56,44,4,5,.6,'#999',1)}<rect x="58" y="78" width="44" height="10" rx="5" fill="none" stroke="#999" stroke-width="1.2"/>`+T(112,30,'gris')+T(112,40,'et boîtes')+T(8,30,'contenu')+T(8,40,'avant style'),
+mock:()=>`${phone(52,6,56,88)}<rect x="58" y="12" width="44" height="7" rx="1" fill="#111"/><rect x="88" y="14" width="10" height="3" rx="1.5" fill="${YEL}"/><g>${photo(58,24,44,26,sid())}</g><rect x="58" y="55" width="34" height="4" rx="2" fill="#111"/>${lines(58,63,44,2,5,.6,'#111',.4)}<rect x="58" y="78" width="44" height="10" rx="5" fill="${RED}"/><text x="80" y="85" text-anchor="middle" font-size="6" font-weight="800" fill="#fff" font-family="Archivo,sans-serif">Réserver</text>`+T(112,30,'vraies')+T(112,40,'couleurs,')+T(112,50,'typos,')+T(112,60,'images'),
+test:()=>`<rect x="18" y="16" width="78" height="52" rx="4" fill="#fff" stroke="${INK}" stroke-width="1.5"/><path d="M10 72h94l-6 6H16z" fill="${INK}" opacity=".8"/>${lines(26,26,40,3,6,.6,'#111',.3)}<rect x="26" y="50" width="30" height="9" rx="4.5" fill="${RED}"/><path d="M66 46l8 16 2-6 6-2z" fill="#111" stroke="#fff"/><rect x="104" y="10" width="52" height="24" rx="8" fill="${YEL}"/><path d="M112 34l-6 8 14-8z" fill="${YEL}"/><text x="130" y="25" text-anchor="middle" font-size="7" font-weight="800" fill="#111" font-family="Archivo,sans-serif">Où cliquer ?</text><rect x="112" y="50" width="40" height="42" rx="3" fill="#fff" stroke="${INK}"/>${[0,1,2].map(i=>`<path d="M117 ${60+i*11}l3 3 5-6" fill="none" stroke="${i===1?RED:'#0a6b2f'}" stroke-width="1.6"/><rect x="129" y="${59+i*11}" width="18" height="2.5" fill="#111" opacity=".35"/>`).join('')}`,
+dsys:()=>`${['#e4002b','#1f3fd1','#ffc400','#111','#f4f3f0'].map((c,i)=>`<rect x="${8+i*16}" y="10" width="13" height="13" rx="3" fill="${c}" stroke="${LN}"/>`).join('')}<text x="92" y="22" font-size="14" font-weight="900" fill="${INK}" font-family="Archivo,sans-serif">Aa</text><text x="115" y="22" font-size="10" font-weight="700" fill="${INK}" font-family="Archivo,sans-serif">Aa</text><text x="134" y="22" font-size="7" fill="${INK}" font-family="Archivo,sans-serif">Aa</text>${[4,8,16,24].map((w,i)=>`<rect x="8" y="${32+i*7}" width="${w*2}" height="4" fill="#ff4fa3" opacity=".6"/><text x="${12+w*2}" y="${36+i*7}" font-size="5.5" fill="${INK}" font-family="Archivo,sans-serif">${w}</text>`).join('')}<rect x="80" y="34" width="44" height="12" rx="6" fill="${RED}"/><rect x="80" y="52" width="70" height="12" rx="3" fill="#fff" stroke="${INK}"/><rect x="128" y="34" width="22" height="12" rx="6" fill="#0a6b2f"/><circle cx="144" cy="40" r="4.5" fill="#fff"/>`+T(8,84,'Couleurs, typos, espaces, composants')
+});
+const diamond=()=>{const half=(pts,f)=>`<polygon points="${pts}" fill="${f}"/>`;const lbl=(x,t,s)=>`<text x="${x}" y="98" text-anchor="middle" font-size="15" font-weight="900" fill="#fff" font-family="Archivo,sans-serif">${t}</text><text x="${x}" y="116" text-anchor="middle" font-size="10" fill="#fff" opacity=".9" font-family="Archivo,sans-serif">${s}</text>`;
+  return `<svg viewBox="0 0 640 210" role="img" aria-label="Schéma du double diamant : découvrir, définir, développer, livrer" style="color:var(--ink)">${half('20,105 165,20 165,190','#1f3fd1')}${half('165,20 310,105 165,190','#16309f')}${half('330,105 475,20 475,190','#e4002b')}${half('475,20 620,105 475,190','#a8001f')}${lbl(105,'Découvrir','on ouvre')}${lbl(230,'Définir','on resserre')}${lbl(415,'Développer','on ouvre')}${lbl(550,'Livrer','on resserre')}<text x="165" y="12" text-anchor="middle" font-size="12" font-weight="800" fill="currentColor" font-family="Archivo,sans-serif">Le bon problème</text><text x="475" y="12" text-anchor="middle" font-size="12" font-weight="800" fill="currentColor" font-family="Archivo,sans-serif">La bonne solution</text><text x="320" y="205" text-anchor="middle" font-size="11" fill="currentColor" opacity=".7" font-family="Archivo,sans-serif">brief → → → → → produit testé</text></svg>`};
+
+/* ---------- onglet UI / UX ---------- */
+onShow.uxui=()=>{if(uxInit)return;uxInit=true;renderUxMoved();
+  $('#uivs').innerHTML=`<div class="grid2">${UIUX.map((x,i)=>`<article class="vs" style="--c:${i?'var(--red)':'var(--blue)'}"><div class="ill">${ill(i?'mock':'tree')}</div><div class="in"><span class="tag">${x[0]}</span><h3>${x[1]}</h3><p>${x[2]}</p><ul class="chips">${x[3].map(t=>`<li>${t}</li>`).join('')}</ul></div></article>`).join('')}</div><p class="callout" style="margin-top:16px"><b>L'image à retenir :</b> dans une maison, l'UX c'est le plan et la façon dont on circule d'une pièce à l'autre ; l'UI, ce sont les matériaux, les couleurs et les poignées de porte. Une belle maison mal pensée reste pénible à vivre.</p>`;
+  $('#diafig').innerHTML=diamond();
+  $('#phases').innerHTML=DIAMANT.map((x,i)=>`<div class="phase" style="--c:${['#1f3fd1','#16309f','#e4002b','#a8001f'][i]}"><span class="eyebrow">${i+1}. ${x[0]}</span><h4>${x[1]}</h4><p class="small" style="margin:0 0 8px">${x[2]}</p><ul>${x[3].map(m=>`<li>${m}</li>`).join('')}</ul></div>`).join('');
+  $('#livrables').innerHTML=LIVRABLES.map((x,i)=>`<div class="concept"><div class="ill">${ill(x[3])}</div><h4><span class="stepn">${i+1}</span>${x[0]}</h4><p>${x[1]}</p><p class="small" style="margin:-8px 16px 16px"><b>Conseil : </b>${x[2]}</p></div>`).join('');
+  $('#uirules').innerHTML=UIRULES.map((x,i)=>`<div class="rcard"><h4><span class="stepn">${i+1}</span>${x[0]}</h4><p>${x[1]}</p><p class="do">${x[2]}</p><p class="dont">${x[3]}</p></div>`).join('');
+  $('#dsys').innerHTML=DSYS.map(d=>`<a class="alt" href="${d[2]}" target="_blank" rel="noopener"><span class="small">${d[1]}</span><b>${d[0]} ↗</b><span>${d[3]}</span></a>`).join('');
+  $('#a11y').innerHTML=A11Y.map((x,i)=>`<div class="num"><div class="top2"><b class="n">${i+1}</b>${favBtn('term','Accessibilité : '+x[0],'Accessibilité : '+x[0],{},true)}</div><h4>${x[0]}</h4><p>${x[1]}</p><p class="small"><b>Vérifier : </b>${x[2]}</p></div>`).join('');
+  $('#a11yTools').innerHTML=A11Y_TOOLS.map(t=>refCard([t[0],t[1],t[2],'',t[3]])).join('');
+  $('#uxw').innerHTML=UXW.map(x=>`<div class="wcard"><h4>${x[0]}</h4><div class="pair"><p class="bad"><span>À éviter</span>${x[1]}</p><p class="good"><span>Mieux</span>${x[2]}</p></div></div>`).join('')};
+$('#uxTabs').addEventListener('click',e=>{const b=e.target.closest('[data-ux]');if(!b)return;$$('#uxTabs .btn').forEach(x=>x.setAttribute('aria-pressed',x===b));$$('.uxp').forEach(p=>p.hidden=p.id!=='ux-'+b.dataset.ux)});
+
+/* ---------- certifications ---------- */
+let cdom='all';
+const DOMC={gra:'var(--red)',ux:'var(--blue)',web:'var(--ora)',a11y:'#0a6b2f',num:'#6a2c91'};
+function renderCerts(){$('#cFilter').innerHTML=CDOM.map(d=>`<button class="btn sm" data-cd="${d[0]}" aria-pressed="${d[0]===cdom}">${d[1]}</button>`).join('');
+  $('#certs').innerHTML=CERTS.filter(c=>cdom==='all'||c[2]===cdom).map(c=>`<article class="cert" style="--c:${DOMC[c[2]]}"><span class="eyebrow">${CDOM.find(d=>d[0]===c[2])[1]}</span><h4>${c[0]}</h4><p class="small" style="margin:-2px 0 4px">${c[1]}</p><div class="badges"><span>${c[3]}</span><span class="${/^Gratuit|gratuite/.test(c[4])?'free':''}">${c[4]}</span></div><p>${c[5]}</p><p class="tip">${c[6]}</p><div class="acts"><a class="btn sm solid" href="${c[7]}" target="_blank" rel="noopener">Site officiel ↗</a>${favBtn('resource',c[7],c[0],{name:c[0],url:c[7],desc:c[5]},true)}</div></article>`).join('')}
+onShow.certifs=()=>{
+  $('#cdiff').innerHTML=[["Certificat de formation","« J'ai suivi ce cours. » Il prouve que vous avez terminé un parcours, pas que vous maîtrisez.","Coursera, Udemy…"],["Certification","« J'ai réussi un examen. » Un score ou un niveau mesuré, souvent reconnu à l'international.","Adobe, Tosa, Opquast…"],["Titre RNCP","Un diplôme reconnu par l'État, avec un niveau (5 = bac+2, 6 = bac+3). S'obtient par une formation ou par la VAE.","Titres professionnels du ministère du Travail"],["Le portfolio d'abord","Dans le design, on vous recrute surtout sur vos projets. Une certification rassure, le portfolio convainc.","Behance, site perso, GitHub"]].map((x,i)=>`<div class="cd${i===3?' hl':''}"><h4>${x[0]}</h4><p>${x[1]}</p><p class="small" style="margin:0">${x[2]}</p></div>`).join('');
+  renderCerts();
+  $('#parcours').innerHTML=PARCOURS.map(p=>`<div class="pc"><h4>${p[0]}</h4><ol>${p.slice(1).map(s=>`<li>${s}</li>`).join('')}</ol></div>`).join('')+`<p class="small" style="grid-column:1/-1;margin:0">Financement : CPF, France Travail, employeur ou école. Vérifiez qu'une certification est bien enregistrée sur francecompetences.fr avant de payer une formation.</p>`};
+$('#cFilter').addEventListener('click',e=>{const b=e.target.closest('[data-cd]');if(!b)return;cdom=b.dataset.cd;renderCerts()});
+
+/* ---------- ArtCraft dans Logiciels ---------- */
+$('#artcraft').innerHTML=`<div class="acx"><div><span class="eyebrow" style="color:#0a6b2f">Gratuit · open source</span><h3 style="margin:4px 0 8px">ArtCraft, la suite gratuite inspirée d'Adobe</h3><p style="margin:0 0 8px">Une suite indépendante (ce n'est pas Adobe), gratuite et open source, pour Windows, macOS, Linux et le navigateur, dont les interfaces reprennent celles de Photoshop, Illustrator, InDesign, Premiere… Parfait pour s'entraîner chez soi sans abonnement.</p><p class="small" style="margin:0"><b>Attention :</b> toutes les applis sont encore en alpha ou en développement. Pour un projet client, gardez un logiciel éprouvé et faites des sauvegardes.</p></div><div><ul class="acl">${ARTCRAFT.map(a=>`<li><b>${a[0]}</b><span>comme ${a[1]}</span><i class="${a[2]==='alpha'?'a':''}">${a[2]}</i></li>`).join('')}</ul><a class="btn sm solid" href="https://getartcraft.com/apps" target="_blank" rel="noopener" style="margin-top:10px">Découvrir ArtCraft ↗</a></div></div>`;
+
+/* ---------- accueil : accès rapides ---------- */
+const QUICK=[["artistes","Culture",BYID.size+" artistes, la symbolique et le lexique","var(--red)","layers",0],["couleurs","Bases du design","Couleurs, typographie, composition, logos","var(--yel)","swatch",0],["uxui","UI / UX","La démarche, les interfaces, l'accessibilité","var(--blue)","wire",1],["logiciels","Logiciels","Photoshop, Illustrator, InDesign, Figma…","var(--ora)","bezier",1],["certifs","Certifications","Faire reconnaître ses compétences","#0a6b2f","dsys",1],["references","Ressources","Les meilleurs sites du métier, triés","#6a2c91","frames",0]];
+$('#quick').innerHTML=`<h3 class="qh">Tout l'atelier</h3><div class="qgrid">${QUICK.map(q=>`<a class="qcard" href="#${q[0]}" style="--c:${q[3]}"><span class="qi">${ill(q[4])}</span><span class="qt"><b>${q[1]}${q[5]?' <em>Nouveau</em>':''}</b><span>${q[2]}</span></span></a>`).join('')}</div>`;
 
 renderDay();route();
 if(!auth)renderAcct();

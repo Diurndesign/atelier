@@ -19,9 +19,8 @@
     <a class="brand" href="#aujourdhui"><i><b></b><b></b><b></b><b></b></i>Atelier <small>la boîte à outils du graphiste</small></a>
     <button class="btn sm" id="acctBtn">Se connecter</button>
   </div>
-  <nav class="tabs" aria-label="Onglets">
-    <a href="#aujourdhui">Aujourd'hui</a><a href="#artistes">Artistes</a><a href="#couleurs">Couleurs</a><a href="#symbolique">Symbolique</a><a href="#composition">Composition</a><a href="#logos">Logos</a><a href="#typo">Typo</a><a href="#methode">Méthode</a><a href="#logiciels">Logiciels</a><a href="#lexique">Lexique</a><a href="#outils">Outils</a><a href="#code">Code</a><a href="#references">Boîte à outils</a><a href="#espace">Mon espace <span class="count" id="favCount">0</span></a>
-  </nav>
+  <nav class="groups" id="groups" aria-label="Rubriques"></nav>
+  <nav class="tabs" id="subnav" aria-label="Sous-rubriques"></nav>
 </header>
 
 <main>
@@ -32,6 +31,7 @@
     <p class="lead" style="margin-top:10px">Chaque jour : un artiste du web, un graphiste, un artiste contemporain et un designer, puis six autres créateurs pour varier les horizons, un mot de vocabulaire et un exercice. Cliquez sur une fiche pour voir les œuvres.</p></div>
     <div class="datebar"><button class="btn" id="prev" aria-label="Jour précédent">←</button><strong id="date">…</strong><button class="btn" id="next" aria-label="Jour suivant">→</button><button class="btn" id="today" hidden>Aujourd'hui</button></div>
   </div>
+  <div class="quick" id="quick"></div>
   <div class="plates" id="plates"></div>
   <div class="sec"><h3 style="margin-bottom:14px">Et aussi aujourd'hui</h3><div class="also" id="also"></div></div>
   <div class="daily">
@@ -292,14 +292,9 @@
 
 <!-- ================= MÉTHODE ================= -->
 <section class="tab band" id="t-methode" hidden><div class="wrap">
-  <div class="head"><div><h2>Méthode</h2><p class="lead" style="margin-top:10px">Ce qui fait la différence entre un beau visuel et un projet qui marche : la perception, l'ergonomie, les bons formats, une check-list de mise en ligne, une méthode de projet et les bases du métier.</p></div></div>
-  <div class="seg" id="mTabs" role="tablist" style="margin-bottom:28px"><button class="btn" data-mt="gestalt" aria-pressed="true">Gestalt</button><button class="btn" data-mt="ux" aria-pressed="false">UX & ergonomie</button><button class="btn" data-mt="ui" aria-pressed="false">Interfaces</button><button class="btn" data-mt="formats" aria-pressed="false">Formats</button><button class="btn" data-mt="check" aria-pressed="false">Mise en ligne</button><button class="btn" data-mt="projet" aria-pressed="false">Projet</button><button class="btn" data-mt="metier" aria-pressed="false">Métier</button></div>
-  <div class="mtp" id="mt-gestalt"><p class="lead" style="margin-bottom:20px">Les lois de la Gestalt décrivent comment notre cerveau regroupe ce qu'il voit. Elles valent autant pour une affiche que pour une page web.</p><div class="formes" id="gestalt"></div></div>
-  <div class="mtp" id="mt-ux" hidden><h3 style="margin-bottom:6px">Les 10 heuristiques de Jakob Nielsen (1994)</h3><p class="lead" style="margin-bottom:16px">La grille la plus utilisée pour évaluer une interface. Passez votre projet au crible, point par point.</p><div class="nums" id="heur"></div>
-    <div class="sec rule"><h3 style="margin-bottom:6px">Les lois et effets à connaître</h3><p class="lead" style="margin-bottom:16px">Des principes de psychologie qui expliquent pourquoi une interface paraît simple… ou pas.</p><div class="figs" id="lois"></div></div></div>
-  <div class="mtp" id="mt-ui" hidden><h3 style="margin-bottom:16px">Repères chiffrés</h3><div class="refstats ui-rep" id="uirep"></div>
-    <div class="sec rule"><h3 style="margin-bottom:6px">Les états d'un composant</h3><p class="lead" style="margin-bottom:16px">Une maquette qui ne montre que l'état par défaut est incomplète. Dessinez aussi ceux-ci :</p><div class="etats" id="etats"></div></div></div>
-  <div class="mtp" id="mt-formats" hidden><div class="grid2"><div><h3 style="margin-bottom:12px">Réseaux sociaux et vidéo</h3><div class="scroll"><table class="tstack"><thead><tr><th>Support</th><th>Taille</th><th>À savoir</th></tr></thead><tbody id="fSoc"></tbody></table></div></div><div><h3 style="margin-bottom:12px">Web</h3><div class="scroll"><table class="tstack"><thead><tr><th>Élément</th><th>Taille</th><th>À savoir</th></tr></thead><tbody id="fWeb"></tbody></table></div></div></div>
+  <div class="head"><div><h2>Méthode de projet</h2><p class="lead" style="margin-top:10px">Ce qui fait la différence entre un beau visuel et un projet qui marche : les bons formats, une check-list de mise en ligne, une méthode de projet du brief à la livraison et les bases du métier d'indépendant.</p></div></div>
+  <div class="seg" id="mTabs" role="tablist" style="margin-bottom:28px"><button class="btn" data-mt="formats" aria-pressed="true">Formats</button><button class="btn" data-mt="check" aria-pressed="false">Mise en ligne</button><button class="btn" data-mt="projet" aria-pressed="false">Projet</button><button class="btn" data-mt="metier" aria-pressed="false">Métier</button></div>
+  <div class="mtp" id="mt-formats"><div class="grid2"><div><h3 style="margin-bottom:12px">Réseaux sociaux et vidéo</h3><div class="scroll"><table class="tstack"><thead><tr><th>Support</th><th>Taille</th><th>À savoir</th></tr></thead><tbody id="fSoc"></tbody></table></div></div><div><h3 style="margin-bottom:12px">Web</h3><div class="scroll"><table class="tstack"><thead><tr><th>Élément</th><th>Taille</th><th>À savoir</th></tr></thead><tbody id="fWeb"></tbody></table></div></div></div>
     <div class="sec rule"><h3 style="margin-bottom:12px">Quel format de fichier choisir ?</h3><div class="scroll"><table class="tstack"><thead><tr><th>Format</th><th>Pour</th><th>À savoir</th></tr></thead><tbody id="fFiles"></tbody></table></div><p class="small" style="margin-top:10px">Formats d'impression et calcul des pixels : onglets <a href="#composition">Composition</a> et <a href="#outils">Outils</a>.</p></div></div>
   <div class="mtp" id="mt-check" hidden><div class="head" style="margin-bottom:12px"><div><h3>Check-list avant de mettre un site en ligne</h3><p class="lead" style="margin-top:6px">Cochez au fur et à mesure : vos coches restent enregistrées sur cet appareil.</p></div><div class="seg"><span class="result" id="ckScore"></span><button class="btn sm" id="ckReset">Tout décocher</button></div></div><div class="checks" id="checks"></div></div>
   <div class="mtp" id="mt-projet" hidden><h3 style="margin-bottom:16px">Les étapes d'un projet de design</h3><ol class="steps8" id="etapes"></ol>
@@ -311,8 +306,38 @@
 <section class="tab band" id="t-logiciels" hidden><div class="wrap">
   <div class="head"><div><h2>Logiciels</h2><p class="lead" style="margin-top:10px">Toutes les clés pour prendre en main les logiciels du graphiste et du webdesigner : l'interface expliquée, les notions à comprendre en images, les raccourcis indispensables, les erreurs à éviter et des tutos gratuits.</p></div>
     <div class="seg" id="lgOs" role="group" aria-label="Raccourcis pour"><span class="small" style="align-self:center;margin-right:4px">Raccourcis :</span><button class="btn sm" data-os="mac" aria-pressed="false">Mac</button><button class="btn sm" data-os="win" aria-pressed="false">Windows</button></div></div>
+  <div class="callout ac" id="artcraft"></div>
   <div class="seg" id="lgTabs" role="tablist" style="margin-bottom:28px"><button class="btn" data-lg="ps" aria-pressed="true">Photoshop</button><button class="btn" data-lg="ai" aria-pressed="false">Illustrator</button><button class="btn" data-lg="id" aria-pressed="false">InDesign</button><button class="btn" data-lg="fig" aria-pressed="false">Figma</button><button class="btn" data-lg="autres" aria-pressed="false">Autres logiciels</button><button class="btn" data-lg="choisir" aria-pressed="false">Lequel choisir ?</button></div>
   <div id="lgPanel"></div>
+</div></section>
+
+<!-- ================= UI / UX ================= -->
+<section class="tab band" id="t-uxui" hidden><div class="wrap">
+  <div class="head"><div><h2>UI / UX</h2><p class="lead" style="margin-top:10px">Concevoir des sites et des applications que les gens comprennent et aiment utiliser : la démarche, les livrables, les règles d'interface, l'accessibilité et l'écriture des textes d'écran.</p></div></div>
+  <div class="seg" id="uxTabs" role="tablist" style="margin-bottom:28px"><button class="btn" data-ux="bases" aria-pressed="true">Les bases</button><button class="btn" data-ux="ui" aria-pressed="false">Interface (UI)</button><button class="btn" data-ux="heur" aria-pressed="false">Heuristiques & lois</button><button class="btn" data-ux="gestalt" aria-pressed="false">Perception</button><button class="btn" data-ux="a11y" aria-pressed="false">Accessibilité</button><button class="btn" data-ux="writing" aria-pressed="false">UX writing</button></div>
+  <div class="uxp" id="ux-bases">
+    <div class="uivs" id="uivs"></div>
+    <div class="sec rule"><h3 style="margin-bottom:6px">La démarche : le double diamant</h3><p class="lead" style="margin-bottom:16px">Le modèle du Design Council britannique : deux fois on ouvre les pistes, deux fois on les resserre. On ne dessine pas d'écran avant d'avoir compris le problème.</p><figure class="diafig" id="diafig"></figure><div class="phases" id="phases"></div></div>
+    <div class="sec rule"><h3 style="margin-bottom:6px">Les livrables, étape par étape</h3><p class="lead" style="margin-bottom:16px">Ce que vous produisez, dans l'ordre, du premier entretien à l'écran final.</p><div class="concepts" id="livrables"></div></div>
+  </div>
+  <div class="uxp" id="ux-gestalt" hidden><p class="lead" style="margin-bottom:20px">Les lois de la Gestalt décrivent comment notre cerveau regroupe ce qu'il voit. Elles valent autant pour une affiche que pour une page web.</p><div class="formes" id="gestalt"></div></div>
+  <div class="uxp" id="ux-heur" hidden><h3 style="margin-bottom:6px">Les 10 heuristiques de Jakob Nielsen (1994)</h3><p class="lead" style="margin-bottom:16px">La grille la plus utilisée pour évaluer une interface. Passez votre projet au crible, point par point.</p><div class="nums" id="heur"></div>
+    <div class="sec rule"><h3 style="margin-bottom:6px">Les lois et effets à connaître</h3><p class="lead" style="margin-bottom:16px">Des principes de psychologie qui expliquent pourquoi une interface paraît simple… ou pas.</p><div class="figs" id="lois"></div></div></div>
+  <div class="uxp" id="ux-ui" hidden><h3 style="margin-bottom:6px">Les 10 règles d'une bonne interface</h3><p class="lead" style="margin-bottom:16px">Ce qu'il faut faire, et l'erreur qu'on voit partout.</p><div class="rules" id="uirules"></div><div class="sec rule"><h3 style="margin-bottom:16px">Repères chiffrés</h3><div class="refstats ui-rep" id="uirep"></div></div>
+    <div class="sec rule"><h3 style="margin-bottom:6px">Les états d'un composant</h3><p class="lead" style="margin-bottom:16px">Une maquette qui ne montre que l'état par défaut est incomplète. Dessinez aussi ceux-ci :</p><div class="etats" id="etats"></div></div><div class="sec rule"><h3 style="margin-bottom:6px">Des design systems à étudier</h3><p class="lead" style="margin-bottom:16px">Les grandes entreprises et les États publient leurs règles : la meilleure école pour apprendre à construire des composants.</p><div class="alts dsys" id="dsys"></div></div></div>
+  <div class="uxp" id="ux-a11y" hidden><div class="callout"><b>Une obligation, pas une option.</b> En France, le RGAA traduit les règles internationales WCAG. Depuis le 28 juin 2025, la directive européenne sur l'accessibilité (European Accessibility Act) l'impose aussi à de nombreux services privés : boutiques en ligne, banques, transports… Un site accessible est aussi plus simple pour tout le monde.</div>
+    <h3 style="margin:24px 0 16px">Les 10 réflexes</h3><div class="nums" id="a11y"></div>
+    <div class="sec rule"><h3 style="margin-bottom:16px">Les outils pour vérifier</h3><div class="refs" id="a11yTools"></div></div></div>
+  <div class="uxp" id="ux-writing" hidden><p class="lead" style="margin-bottom:20px">Les mots font partie de l'interface. Un bon texte d'écran est court, précis et dit à la personne quoi faire ensuite.</p><div class="uxw" id="uxw"></div></div>
+</div></section>
+
+<!-- ================= CERTIFICATIONS ================= -->
+<section class="tab band" id="t-certifs" hidden><div class="wrap">
+  <div class="head"><div><h2>Certifications</h2><p class="lead" style="margin-top:10px">Faire reconnaître ses compétences en graphisme, en UI / UX et en développement web : les certifications qui comptent, ce qu'elles valent, combien elles coûtent et par où commencer.</p></div></div>
+  <div class="cdiff" id="cdiff"></div>
+  <div class="sec"><div class="head" style="margin-bottom:14px"><h3>Les certifications à connaître</h3><div class="seg" id="cFilter"></div></div><div class="certs" id="certs"></div>
+  <p class="small" style="margin-top:14px">Prix et conditions indicatifs, relevés en novembre 2026 : vérifiez toujours sur le site de l'organisme et, pour un financement CPF, sur moncompteformation.gouv.fr.</p></div>
+  <div class="sec rule"><h3 style="margin-bottom:16px">Quel parcours selon votre métier ?</h3><div class="parcours" id="parcours"></div></div>
 </div></section>
 
 <!-- ================= LEXIQUE ================= -->
@@ -432,6 +457,7 @@
 <script src="js/data3.js"></script>
 <script src="js/data4.js"></script>
 <script src="js/data5.js"></script>
+<script src="js/data6.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
