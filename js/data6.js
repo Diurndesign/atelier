@@ -12,6 +12,7 @@ const DIAMANT=[["Découvrir","Comprendre le problème","Qui sont les utilisateur
 
 /* Les livrables UX/UI : [nom, ce que c'est, conseil, illustration] */
 const LIVRABLES=[["Persona","Un portrait d'utilisateur type, construit à partir d'entretiens réels : objectifs, frustrations, contexte d'usage.","Basez-le sur de vraies données, pas sur votre imagination : 3 personas suffisent.","persona"],
+["Parcours utilisateur","Les étapes vécues par la personne, de la découverte à l'objectif atteint, avec ses émotions à chaque étape.","Les creux de la courbe sont vos meilleures pistes d'amélioration.","journey"],
 ["Arborescence","Le plan du site ou de l'application : quelles pages, rangées comme quoi, à combien de clics.","Testez-la avec un tri de cartes : les utilisateurs rangent les contenus à leur façon.","tree"],
 ["Wireframe","Un schéma en niveaux de gris de chaque écran : où vont les contenus et les actions, sans couleur ni décor.","Restez moche exprès : on discute de l'organisation, pas du style.","wire"],
 ["Maquette","L'écran final, avec la vraie typo, les couleurs, les images et les textes. C'est ici que travaille l'UI.","Mobile first : dessinez le téléphone en premier, puis l'écran large.","mock"],
