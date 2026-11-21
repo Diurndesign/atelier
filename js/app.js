@@ -102,7 +102,7 @@ document.addEventListener('click',e=>{
 $$('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d)d.close()}));
 
 /* ---------- router ---------- */
-const TABS=['aujourdhui','artistes','couleurs','symbolique','composition','logos','typo','methode','lexique','outils','code','references','espace'];
+const TABS=['aujourdhui','artistes','couleurs','symbolique','composition','logos','typo','methode','logiciels','lexique','outils','code','references','espace'];
 const onShow={};
 function route(){let t=location.hash.slice(1);if(!TABS.includes(t))t='aujourdhui';current=t;
   $$('.tab').forEach(s=>s.hidden=s.id!=='t-'+t);
@@ -129,10 +129,20 @@ function renderDay(){const [d,n]=dayN();
   $('#date').textContent=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});$('#today').hidden=off===0;
   $('#plates').innerHTML=CATS.slice(0,4).map((c,i)=>plate(BYID.get(c.k+':'+c.list[(n+i*7)%c.list.length][0]))).join('');
   $('#also').innerHTML=CATS.slice(4).map((c,i)=>acard(BYID.get(c.k+':'+c.list[(n*3+i*5)%c.list.length][0]))).join('');
-  $('#exo').textContent=EXO[n%EXO.length];
+  $('#exo').textContent=EXO[n%EXO.length];heroImgs();
   const t=LEX[(n*7)%LEX.length];
   $('#word').innerHTML=`<span class="eyebrow">Mot du jour · ${t[1]}</span><b class="t">${t[0]}</b><p style="margin:0;font-size:17px">${t[2]}</p><div class="acts">${favBtn('term',t[0],t[0],{},false)}<a class="btn sm" href="#lexique">Tout le lexique</a></div>`;
 }
+
+/* une vraie image libre (Wikimedia Commons) sur les fiches du jour, sinon le motif reste */
+const HC=new Map();let heroTok=0;
+async function heroImgs(){const tok=++heroTok;
+  await Promise.all($$('#plates .art[data-open-artist], #also .art[data-open-artist]').map(async el=>{const id=el.dataset.openArtist,x=BYID.get(id);if(!x)return;
+    let o=HC.get(id);if(o===undefined){try{o=(await workImgs(x,1,true))[0]||null}catch(e){o=null}HC.set(id,o)}
+    if(tok!==heroTok||!o||!el.isConnected||el.querySelector('.shot'))return;
+    const cr=document.createElement('span');cr.className='credit';cr.textContent=o.title+' · '+o.author+' · '+o.lic+' (Wikimedia Commons)';
+    const img=new Image();img.className='shot';img.alt=o.title;img.src=o.thumb;img.onload=()=>{img.classList.add('on');cr.classList.add('on')};
+    el.prepend(img);el.append(cr)}))}
 $('#prev').onclick=()=>{off--;renderDay()};$('#next').onclick=()=>{off++;renderDay()};$('#today').onclick=()=>{off=0;renderDay()};
 document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('.art[data-open-artist]')){e.preventDefault();openArtist(e.target.dataset.openArtist)}});
 
@@ -143,20 +153,23 @@ const stripTags=h=>{const d=document.createElement('div');d.innerHTML=h||'';retu
 let galTok=0;
 async function commons(q,limit){const u='https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit='+limit+'&gsrsearch='+encodeURIComponent(q+' filetype:bitmap')+'&prop=imageinfo&iiprop=url|size|extmetadata&iiurlwidth=600';
   const r=await fetch(u);if(!r.ok)return [];const j=await r.json();return Object.values(j.query?.pages||{}).sort((a,b)=>a.index-b.index)}
-async function loadGallery(x){
-  const tok=++galTok,{a,c}=x,gal=$('#gal');
-  const clean=a[0].replace(/\s*\(.*?\)/g,'');const sur=/&|teamLab|JODI|Grapus|Nendo|Experimental|M\/M|SANAA|Formafantasma|Studio|Architects|Chermayeff/i.test(a[0])?clean:clean.split(' ').pop();
-  const qs=works(a).slice(0,3).map(w=>w.t.replace(/\s*\(.*?\)/g,'')+' '+sur);qs.push(clean+' '+(CQ[c.k]||'artwork'));
-  let res=[];try{res=(await Promise.all(qs.map(q=>commons(q,6).catch(()=>[])))).flat()}catch(e){}
-  if(tok!==galTok)return;
-  const seen=new Set(),nm=norm(clean).replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim(),out=[];
+async function workImgs(x,max,strict){
+  const {a,c}=x;const clean=a[0].replace(/\s*\(.*?\)/g,'');const sur=/&|teamLab|JODI|Grapus|Nendo|Experimental|M\/M|SANAA|Formafantasma|Studio|Architects|Chermayeff/i.test(a[0])?clean:clean.split(' ').pop();
+  const qs=works(a).slice(0,3).map(w=>w.t.replace(/\s*\(.*?\)/g,'')+' '+sur);if(!strict)qs.push(clean+' '+(CQ[c.k]||'artwork'));
+  let res=[];try{res=(await Promise.all(qs.map(q=>commons(q,strict?4:6).catch(()=>[])))).flat()}catch(e){}
+  const seen=new Set(),nm=norm(clean).replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim(),ns=norm(sur).replace(/[^a-z ]/g,' ').trim(),out=[];
   for(const p of res){if(seen.has(p.pageid))continue;seen.add(p.pageid);const i=p.imageinfo&&p.imageinfo[0];if(!i||!i.thumburl)continue;
     const title=p.title.replace(/^File:/,'').replace(/\.[^.]+$/,'');const md=i.extmetadata||{};
     const txt=title+' '+(md.Categories?.value||'')+' '+stripTags(md.ImageDescription?.value);
     if(BAD.test(txt))continue;
     const tn=norm(title).replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim();if(tn===nm||tn.replace(/ \w$/,'')===nm)continue;
+    if(strict&&(!ns||!norm(txt).replace(/[^a-z ]/g,' ').includes(ns)||(i.width&&i.width<400)))continue;
     out.push({title,thumb:i.thumburl,big:(i.width&&i.width<=1600)?i.url:i.thumburl.replace(/\/\d+px-/,'/1280px-'),page:i.descriptionurl,author:stripTags(md.Artist?.value)||'Auteur non précisé',lic:md.LicenseShortName?.value||'Licence libre'});
-    if(out.length>=12)break}
+    if(out.length>=max)break}
+  return out}
+async function loadGallery(x){
+  const tok=++galTok,gal=$('#gal');const out=await workImgs(x,12,false);
+  if(tok!==galTok)return;
   gal.innerHTML=out.length?out.map(o=>`<figure><button data-zoom="${esc(o.big)}" data-cap="${esc(o.title+' — '+o.author+' · '+o.lic)}"><img loading="lazy" src="${esc(o.thumb)}" alt="${esc(o.title)}"></button><figcaption>${esc(o.title)}<br>${esc(o.author)} · ${esc(o.lic)} · <a href="${esc(o.page)}" target="_blank" rel="noopener">source</a></figcaption></figure>`).join('')
   :`<p class="empty" style="grid-column:1/-1">Aucune image libre de droits trouvée. Les œuvres récentes sont protégées par le droit d'auteur et ne figurent pas sur Wikimedia Commons : utilisez les boutons « Voir l'image » ci-dessus.</p>`;
 }
@@ -488,6 +501,132 @@ function espaceGroup(k,l){const del=r=>favBtn(r.kind,r.key,r.label,r.data,true);
 onShow.espace=renderEspace;
 
 /* ---------- start ---------- */
+/* Atelier — onglet Logiciels : schémas d'interface, illustrations des notions, raccourcis Mac / Windows */
+let SUID=0;const sid=()=>'lg'+(++SUID);
+const INK='currentColor',BG='var(--bg)',PAN='var(--panel)',LN='var(--line)',RED='var(--red)',BLU='var(--blue)',YEL='var(--yel)',ORA='var(--ora)';
+const T=(x,y,t,o='')=>`<text x="${x}" y="${y}" font-size="8" font-weight="700" fill="${INK}" font-family="Archivo,system-ui,sans-serif" ${o}>${t}</text>`;
+const lines=(x,y,w,n,gap=5,last=.6,col=INK,op=.35)=>{let s='';for(let i=0;i<n;i++)s+=`<rect x="${x}" y="${y+i*gap}" width="${i===n-1?w*last:w}" height="2" rx="1" fill="${col}" opacity="${op}"/>`;return s};
+const photo=(x,y,w,h,id)=>`<defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fb2ff"/><stop offset="1" stop-color="#cfe2ff"/></linearGradient></defs><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#${id})"/><circle cx="${x+w*.72}" cy="${y+h*.3}" r="${h*.13}" fill="${YEL}"/><path d="M${x} ${y+h}L${x+w*.32} ${y+h*.42}L${x+w*.55} ${y+h*.75}L${x+w*.72} ${y+h*.55}L${x+w} ${y+h}Z" fill="#1d2a52"/><path d="M${x+w*.32} ${y+h*.42}L${x+w*.4} ${y+h*.56}L${x+w*.25} ${y+h*.56}Z" fill="#fff" opacity=".85"/>`;
+const checker=id=>`<pattern id="${id}" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#fff"/><rect width="4" height="4" fill="#ddd"/><rect x="4" y="4" width="4" height="4" fill="#ddd"/></pattern>`;
+const arrow=(x1,y1,x2,y2)=>`<path d="M${x1} ${y1}L${x2} ${y2}" stroke="${INK}" stroke-width="1.6" marker-end="url(#ah)"/>`;
+const AH=`<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>`;
+const anchor=(x,y,sel)=>`<rect x="${x-2.6}" y="${y-2.6}" width="5.2" height="5.2" fill="${sel?BLU:'#fff'}" stroke="${BLU}" stroke-width="1.2"/>`;
+const handle=(x1,y1,x2,y2)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${BLU}" stroke-width="1"/><circle cx="${x2}" cy="${y2}" r="2.4" fill="${BLU}"/>`;
+const phone=(x,y,w,h,o='')=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="#fff" stroke="${INK}" stroke-width="1.5" ${o}/>`;
+
+const ILL={
+layers:()=>{const c=['#fff',BLU,YEL],lb=['Fond','Forme','Texte'];let s='';for(let i=0;i<3;i++){const d=i*20;s+=`<path d="M22 ${78-d}L82 ${78-d}L112 ${58-d}L52 ${58-d}Z" fill="${c[i]}" fill-opacity="${i?.85:1}" stroke="${INK}" stroke-width="1.5"/>`;s+=`<line x1="114" y1="${66-d}" x2="122" y2="${66-d}" stroke="${INK}" stroke-dasharray="2 2"/>`+T(124,69-d,lb[i])}
+  return s+`<text x="60" y="${31}" text-anchor="middle" font-size="9" font-weight="900" fill="#111" font-family="Archivo,sans-serif" transform="skewX(-30) translate(18 0)">Aa</text>`},
+mask:()=>{const g=sid(),c=sid(),m=sid();return `<defs>${checker(c)}<mask id="${m}"><rect x="112" y="26" width="42" height="42" fill="#000"/><circle cx="133" cy="47" r="16" fill="#fff"/></mask></defs>${photo(6,26,42,42,g)}<rect x="6" y="26" width="42" height="42" fill="none" stroke="${INK}"/>`+T(56,51,'+')+`<rect x="64" y="26" width="42" height="42" fill="#000" stroke="${INK}"/><circle cx="85" cy="47" r="16" fill="#fff"/>`+T(108,51,'=')+`<rect x="112" y="26" width="42" height="42" fill="url(#${c})" stroke="${INK}"/><g mask="url(#${m})">${photo(112,26,42,42,g+'b')}</g>`+T(6,82,'Photo')+T(64,82,'Masque')+T(112,82,'Résultat')+`<text x="64" y="92" font-size="6.5" fill="${INK}" opacity=".7" font-family="Archivo,sans-serif">noir cache · blanc montre</text>`},
+adjust:()=>{let g='';for(let i=1;i<4;i++)g+=`<line x1="${45+i*17.5}" y1="12" x2="${45+i*17.5}" y2="82" stroke="${LN}"/><line x1="45" y1="${12+i*17.5}" x2="115" y2="${12+i*17.5}" stroke="${LN}"/>`;let h='';const hv=[4,8,14,22,30,26,34,40,28,18,12,8,5,3];hv.forEach((v,i)=>h+=`<rect x="${46+i*5}" y="${82-v}" width="4" height="${v}" fill="${INK}" opacity=".12"/>`);
+  return `<rect x="45" y="12" width="70" height="70" fill="${BG}" stroke="${INK}" stroke-width="1.5"/>${g}${h}<line x1="45" y1="82" x2="115" y2="12" stroke="${INK}" stroke-dasharray="3 3" opacity=".5"/><path d="M45 82C70 82 62 30 80 40C96 48 92 12 115 12" fill="none" stroke="${RED}" stroke-width="2.4"/><circle cx="80" cy="40" r="3" fill="${RED}"/>`+T(120,30,'Clairs')+T(120,48,'+ de')+T(120,57,'contraste')+T(8,80,'Ombres')},
+smart:()=>{let px='';const N=8;for(let y=0;y<N;y++)for(let x=0;x<N;x++){const dx=x-3.5,dy=y-3.5;if(dx*dx+dy*dy<12)px+=`<rect x="${14+x*7}" y="${16+y*7}" width="7" height="7" fill="${RED}"/>`}
+  return `<rect x="10" y="12" width="64" height="64" fill="${BG}" stroke="${LN}"/>${px}<rect x="86" y="12" width="64" height="64" fill="${BG}" stroke="${LN}"/><circle cx="118" cy="44" r="23" fill="${RED}"/><rect x="134" y="62" width="12" height="10" rx="2" fill="#fff" stroke="${INK}"/><path d="M137 69h6v-3" fill="none" stroke="${INK}"/>`+T(10,88,'Calque normal')+T(86,88,'Objet dynamique')+`<text x="10" y="97" font-size="6.5" fill="${INK}" opacity=".7" font-family="Archivo,sans-serif">réduit puis agrandi : flou</text><text x="86" y="97" font-size="6.5" fill="${INK}" opacity=".7" font-family="Archivo,sans-serif">reste net</text>`},
+clip:()=>{const c=sid(),g=sid();return `<defs><clipPath id="${c}"><text x="80" y="66" text-anchor="middle" font-size="52" font-weight="900" font-family="Archivo,Arial Black,sans-serif">ART</text></clipPath></defs><g opacity=".15">${photo(14,14,132,62,g+'a')}</g><g clip-path="url(#${c})">${photo(14,14,132,62,g)}</g><text x="80" y="66" text-anchor="middle" font-size="52" font-weight="900" font-family="Archivo,Arial Black,sans-serif" fill="none" stroke="${INK}" stroke-width=".8">ART</text>`+T(14,92,'Photo visible dans le texte')},
+blend:()=>`<rect x="4" y="8" width="72" height="72" rx="6" fill="#fff"/><g style="isolation:isolate"><circle cx="30" cy="40" r="20" fill="#ffc400"/><circle cx="50" cy="40" r="20" fill="#00a3ff" style="mix-blend-mode:multiply"/></g><rect x="84" y="8" width="72" height="72" rx="6" fill="#1a1a1a"/><g style="isolation:isolate"><circle cx="110" cy="40" r="20" fill="#e4002b"/><circle cx="130" cy="40" r="20" fill="#1f3fd1" style="mix-blend-mode:screen"/></g>`+T(4,91,'Produit')+T(84,91,'Écran')+`<text x="4" y="99" font-size="6.5" fill="${INK}" opacity=".7" font-family="Archivo,sans-serif">assombrit</text><text x="84" y="99" font-size="6.5" fill="${INK}" opacity=".7" font-family="Archivo,sans-serif">éclaircit</text>`,
+bezier:()=>`<path d="M15 72C35 22 65 22 80 50C95 78 125 78 145 28" fill="none" stroke="${INK}" stroke-width="2.4"/>${handle(15,72,35,22)}${handle(80,50,65,22)}${handle(80,50,95,78)}${handle(145,28,125,78)}${anchor(15,72)}${anchor(80,50,1)}${anchor(145,28)}`+T(6,92,'■ ancrage')+T(84,92,'● poignée'),
+pen:()=>`<path d="M14 76L44 24L80 70C92 86 124 86 134 40" fill="none" stroke="${INK}" stroke-width="2.2"/>${anchor(14,76)}${anchor(44,24)}${anchor(80,70)}${handle(80,70,62,47)}${handle(80,70,98,93)}${anchor(134,40,1)}<g transform="translate(136 18) rotate(35)"><path d="M0 0L6 14L0 22L-6 14Z" fill="${INK}"/><circle cy="13" r="1.8" fill="${BG}"/></g>`+T(4,90,'1 clic')+T(36,18,'2 clic')+T(86,64,'3 clic-glisser'),
+pathfinder:()=>`<circle cx="24" cy="44" r="16" fill="none" stroke="${INK}" stroke-width="1.5"/><circle cx="40" cy="44" r="16" fill="none" stroke="${INK}" stroke-width="1.5"/>${arrow(60,44,72,44)}<circle cx="86" cy="44" r="16" fill="${BLU}"/><circle cx="102" cy="44" r="16" fill="${BLU}"/><path d="M134 30.15A16 16 0 1 0 134 57.85A16 16 0 0 1 134 30.15Z" fill="${RED}"/><path d="M134 30.15A16 16 0 0 1 134 57.85" fill="none" stroke="${INK}" stroke-dasharray="2 2"/>`+T(10,80,'2 formes')+T(80,80,'Union')+T(118,80,'Soustraire'),
+artboards:()=>`<rect x="6" y="18" width="52" height="52" fill="#fff" stroke="${INK}"/><circle cx="32" cy="44" r="14" fill="${RED}"/><path d="M26 44l5 5 8-10" fill="none" stroke="#fff" stroke-width="3"/><rect x="64" y="18" width="52" height="52" fill="#fff" stroke="${INK}"/><circle cx="90" cy="44" r="14" fill="#111"/><path d="M84 44l5 5 8-10" fill="none" stroke="#fff" stroke-width="3"/><rect x="122" y="30" width="30" height="30" rx="7" fill="#111" stroke="${INK}"/><circle cx="137" cy="45" r="9" fill="#fff"/>`+T(6,12,'Plan 1')+T(64,12,'Plan 2')+T(122,24,'Plan 3')+T(6,84,'Couleur')+T(64,84,'Noir')+T(122,72,'Icône'),
+swatch:()=>{const cs=['#e4002b','#1f3fd1','#ffc400','#111'];let s='';cs.forEach((c,i)=>{s+=`<rect x="${16+i*24}" y="10" width="20" height="20" fill="${c}" stroke="${INK}"/>`});s+=`<path d="M36 30L36 22L28 30Z" fill="#fff"/>`;
+  s+=`<path d="M26 32C26 50 30 52 30 62M26 32C40 46 72 46 80 60M26 32C60 40 120 40 128 58" fill="none" stroke="${RED}" stroke-dasharray="2 2"/><rect x="16" y="62" width="28" height="20" fill="#e4002b"/><circle cx="82" cy="72" r="11" fill="#e4002b"/><path d="M128 60l12 22h-24z" fill="#e4002b"/>`;return s+T(116,24,'couleur')+T(116,33,'globale')},
+appearance:()=>`<rect x="12" y="14" width="72" height="62" rx="12" fill="none" stroke="${RED}" stroke-width="2" stroke-dasharray="4 3"/><rect x="18" y="20" width="60" height="50" rx="8" fill="${YEL}" stroke="${INK}" stroke-width="3"/><rect x="96" y="16" width="58" height="60" rx="4" fill="${PAN}" stroke="${LN}"/>`+T(100,28,'Aspect')+`<line x1="100" y1="32" x2="150" y2="32" stroke="${LN}"/>`+T(100,44,'Contour 2',`fill="${RED}"`)+T(100,56,'Contour 1')+T(100,68,'Fond'),
+frames:()=>{const c=sid(),g=sid();return `<defs><clipPath id="${c}"><rect x="30" y="22" width="56" height="52"/></clipPath></defs><g opacity=".22">${photo(14,12,92,74,g+'a')}</g><g clip-path="url(#${c})">${photo(14,12,92,74,g)}</g><rect x="30" y="22" width="56" height="52" fill="none" stroke="${BLU}" stroke-width="1.6"/>${[[30,22],[86,22],[30,74],[86,74]].map(p=>`<rect x="${p[0]-2.5}" y="${p[1]-2.5}" width="5" height="5" fill="#fff" stroke="${BLU}"/>`).join('')}<circle cx="58" cy="48" r="5" fill="none" stroke="${ORA}" stroke-width="1.5"/><circle cx="58" cy="48" r="1.6" fill="${ORA}"/><rect x="114" y="22" width="40" height="52" fill="none" stroke="${BLU}" stroke-width="1.2"/>${lines(118,28,32,8,5.5)}`+T(14,96,'Bloc image : on recadre dedans')+T(114,86,'Bloc texte')},
+fframe:()=>`<rect x="6" y="18" width="40" height="72" rx="3" fill="#fff" stroke="${INK}" stroke-width="1.2"/><rect x="10" y="22" width="32" height="6" rx="1" fill="${INK}" opacity=".8"/><rect x="10" y="32" width="32" height="22" rx="2" fill="${BLU}" opacity=".6"/>${lines(10,58,32,3,4)}<rect x="10" y="76" width="32" height="8" rx="4" fill="${RED}"/><rect x="56" y="18" width="98" height="62" rx="3" fill="#fff" stroke="${INK}" stroke-width="1.2"/><rect x="60" y="22" width="90" height="6" rx="1" fill="${INK}" opacity=".8"/><rect x="60" y="32" width="42" height="34" rx="2" fill="${BLU}" opacity=".6"/>${lines(106,34,44,5,5)}<rect x="106" y="62" width="26" height="8" rx="4" fill="${RED}"/>`+T(6,12,'Mobile 390')+T(56,12,'Desktop 1440'),
+master:()=>{const pg=(x,y,w,h,par)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#fff" stroke="${par?RED:INK}" stroke-width="${par?1.6:1}" ${par?'stroke-dasharray="3 2"':''}/><rect x="${x+3}" y="${y+3}" width="${w-6}" height="3" fill="${RED}"/><rect x="${x+w/2-2}" y="${y+h-6}" width="4" height="3" fill="${INK}" opacity=".6"/>`;
+  let s=pg(62,4,34,40,1)+T(100,20,'Page parent',`fill="${RED}"`)+T(100,29,'en-tête + folio');[14,63,112].forEach((x,i)=>{s+=pg(x,54,34,40)+lines(x+5,63,24,4,5);s+=`<path d="M79 44Q${x+17} 48 ${x+17} 53" fill="none" stroke="${RED}" stroke-width="1" stroke-dasharray="2 2"/>`});return s},
+styles:()=>`<rect x="8" y="10" width="86" height="80" fill="#fff" stroke="${LN}"/><rect x="14" y="16" width="60" height="7" fill="${INK}"/><rect x="14" y="28" width="72" height="3.5" fill="${INK}" opacity=".7"/><rect x="14" y="34" width="50" height="3.5" fill="${INK}" opacity=".7"/>${lines(14,44,72,7,5.5,.5)}<rect x="104" y="10" width="50" height="80" rx="4" fill="${PAN}" stroke="${LN}"/>`+T(108,22,'Styles')+`<rect x="106" y="28" width="46" height="12" rx="2" fill="${BLU}" opacity=".18"/>`+T(109,37,'Titre')+T(109,52,'Chapô')+T(109,66,'Texte')+T(109,80,'Légende')+`<path d="M76 19H104M88 33H104M88 52H104" stroke="${BLU}" stroke-dasharray="2 2"/>`,
+thread:()=>`<rect x="10" y="12" width="56" height="70" fill="#fff" stroke="${BLU}" stroke-width="1.2"/>${lines(15,18,46,11,5.6,1)}<rect x="61" y="77" width="9" height="9" fill="#fff" stroke="${BLU}"/><path d="M63.5 79.5l4 2-4 2z" fill="${BLU}"/><rect x="94" y="12" width="56" height="70" fill="#fff" stroke="${BLU}" stroke-width="1.2"/>${lines(99,18,46,8,5.6)}<rect x="89.5" y="7.5" width="9" height="9" fill="#fff" stroke="${BLU}"/><path d="M92 10l4 2-4 2z" fill="${BLU}"/><path d="M70 81C82 81 78 12 90 12" fill="none" stroke="${BLU}" stroke-width="1.2"/>`+T(10,97,'Le texte coule d\'un bloc à l\'autre'),
+baseline:()=>{let g='';for(let i=0;i<13;i++)g+=`<line x1="8" y1="${14+i*6}" x2="152" y2="${14+i*6}" stroke="#00a3ff" stroke-width=".6" opacity=".7"/>`;let c='';
+  c+=`<rect x="12" y="13" width="64" height="10" fill="${INK}"/>`;for(let i=3;i<13;i++)c+=`<rect x="12" y="${14+i*6-2.5}" width="${i===12?40:64}" height="2.5" fill="${INK}" opacity=".55"/>`;for(let i=0;i<13;i++)c+=`<rect x="86" y="${14+i*6-2.5}" width="${i===12?30:64}" height="2.5" fill="${INK}" opacity=".55"/>`;
+  return g+c+T(8,96,'Lignes calées sur la grille')},
+package:()=>`<path d="M14 26h40l8 8h84v54H14z" fill="${YEL}" stroke="${INK}" stroke-width="1.5"/><rect x="24" y="42" width="26" height="32" rx="2" fill="#fff" stroke="${INK}"/><text x="37" y="64" text-anchor="middle" font-size="13" font-weight="800" fill="#111" font-family="Georgia,serif">Aa</text><rect x="58" y="42" width="26" height="32" rx="2" fill="#fff" stroke="${INK}"/><path d="M61 70l7-10 5 6 3-3 6 7z" fill="${BLU}"/><circle cx="77" cy="50" r="3" fill="${RED}"/><rect x="92" y="42" width="26" height="32" rx="2" fill="#fff" stroke="${INK}"/><text x="105" y="62" text-anchor="middle" font-size="7" font-weight="800" fill="#111" font-family="Archivo,sans-serif">.indd</text><rect x="122" y="42" width="20" height="32" rx="2" fill="${RED}"/><text x="132" y="62" text-anchor="middle" font-size="7" font-weight="800" fill="#fff" font-family="Archivo,sans-serif">PDF</text>`+T(14,20,'Assemblage')+T(24,84,'polices',`fill="#111"`)+T(58,84,'images',`fill="#111"`),
+autolayout:()=>`<rect x="40" y="8" width="80" height="84" rx="6" fill="#fff" stroke="#9747ff" stroke-width="1.5"/><rect x="50" y="18" width="60" height="16" rx="3" fill="${INK}" opacity=".85"/><rect x="50" y="42" width="60" height="16" rx="3" fill="${BLU}" opacity=".7"/><rect x="50" y="66" width="60" height="16" rx="8" fill="${RED}"/><rect x="40" y="8" width="10" height="84" fill="#ff4fa3" opacity=".12"/><rect x="110" y="8" width="10" height="84" fill="#ff4fa3" opacity=".12"/><rect x="50" y="34" width="60" height="8" fill="#ff4fa3" opacity=".3"/><rect x="50" y="58" width="60" height="8" fill="#ff4fa3" opacity=".3"/>`+T(124,41,'écart 16')+T(124,65,'écart 16')+T(2,52,'marge')+T(2,61,'24'),
+components:()=>{const dia=(x,y,f)=>`<path d="M${x} ${y-4}l4 4-4 4-4-4z" fill="${f?'#9747ff':'none'}" stroke="#9747ff" stroke-width="1.2"/>`;
+  return `<rect x="10" y="30" width="50" height="20" rx="10" fill="${RED}" stroke="#9747ff" stroke-width="1.5" stroke-dasharray="3 2"/><text x="35" y="43.5" text-anchor="middle" font-size="7.5" font-weight="800" fill="#fff" font-family="Archivo,sans-serif">Bouton</text>${dia(14,22,1)}`+T(20,25,'Composant',`fill="#9747ff"`)+[0,1,2].map(i=>`<path d="M62 40C78 40 76 ${16+i*28} 92 ${16+i*28}" fill="none" stroke="#9747ff" stroke-width="1" stroke-dasharray="2 2"/><rect x="96" y="${6+i*28}" width="50" height="20" rx="10" fill="${i===1?'#a8001f':i===2?'var(--panel)':RED}" stroke="${i===2?LN:'none'}"/><text x="121" y="${19.5+i*28}" text-anchor="middle" font-size="7.5" font-weight="800" fill="${i===2?'var(--mute)':'#fff'}" font-family="Archivo,sans-serif">Bouton</text>${dia(150,16+i*28,0)}`).join('')+T(4,92,'Instances : survol, désactivé…')},
+constraints:()=>{const fr=(x,w)=>`<rect x="${x}" y="14" width="${w}" height="66" rx="3" fill="#fff" stroke="${INK}" stroke-width="1.2"/><rect x="${x+5}" y="19" width="${w-10}" height="8" rx="1" fill="${BLU}" opacity=".7"/><line x1="${x}" y1="23" x2="${x+5}" y2="23" stroke="${RED}"/><line x1="${x+w-5}" y1="23" x2="${x+w}" y2="23" stroke="${RED}"/><rect x="${x+w-29}" y="64" width="24" height="10" rx="5" fill="${RED}"/><line x1="${x+w-5}" y1="69" x2="${x+w}" y2="69" stroke="${RED}"/><line x1="${x+w-17}" y1="74" x2="${x+w-17}" y2="80" stroke="${RED}"/>`;
+  return fr(8,52)+fr(72,80)+T(8,92,'Le bouton reste collé en bas à droite')},
+proto:()=>`${phone(14,10,40,76)}<rect x="19" y="18" width="30" height="20" rx="2" fill="${BLU}" opacity=".6"/>${lines(19,44,30,3,5)}<rect x="19" y="68" width="30" height="9" rx="4.5" fill="${RED}"/>${phone(106,10,40,76)}<rect x="111" y="18" width="30" height="6" rx="1" fill="${INK}" opacity=".8"/>${lines(111,30,30,7,5)}<path d="M49 72C80 72 74 30 104 30" fill="none" stroke="#2a7fff" stroke-width="1.8" marker-end="url(#ah)"/><circle cx="49" cy="72" r="2.5" fill="#2a7fff"/>`+T(80,98,'Au clic → écran 2','text-anchor="middle"')
+};
+const ill=k=>`<svg viewBox="0 0 160 100" role="img" aria-hidden="true" style="color:var(--ink)">${AH}${(ILL[k]||(()=>''))()}</svg>`;
+
+/* schéma d'interface */
+function uiSchema(s){const zones=s.ui.map(z=>z[1]);const hasL2=zones.includes('left2'),hasL=zones.includes('left');
+  const cx=hasL2?82:hasL?26:8,cw=236-cx;const Z={top:[6,18,308,12],left:[6,34,16,170],left2:[6,34,72,170],canvas:[cx,34,cw,170],panel1:[240,34,74,84],panel2:[240,122,74,82],bottom:[cx+cw/2-48,186,96,14]};
+  let o=`<rect x="1" y="1" width="318" height="208" rx="10" fill="${PAN}" stroke="${INK}" stroke-width="2"/>`+[0,1,2].map(i=>`<circle cx="${12+i*9}" cy="9" r="2.6" fill="${['#ff5f57','#febc2e','#28c840'][i]}"/>`).join('');
+  const box=(k,f=BG)=>{const z=Z[k];return `<rect x="${z[0]}" y="${z[1]}" width="${z[2]}" height="${z[3]}" rx="3" fill="${f}" stroke="${LN}"/>`};
+  if(zones.includes('top')){o+=box('top');for(let i=0;i<7;i++)o+=`<rect x="${12+i*22}" y="22" width="16" height="4" rx="2" fill="${INK}" opacity=".3"/>`}
+  else o+=`<rect x="6" y="18" width="308" height="12" rx="3" fill="${BG}" stroke="${LN}"/>`+`<rect x="12" y="22" width="40" height="4" rx="2" fill="${INK}" opacity=".3"/><rect x="270" y="21" width="38" height="6" rx="3" fill="#9747ff" opacity=".8"/>`;
+  if(hasL){o+=box('left');for(let i=0;i<12;i++)o+=`<rect x="10" y="${40+i*13}" width="8" height="8" rx="1.5" fill="${INK}" opacity="${i===0?.8:.3}"/>`}
+  if(hasL2){o+=box('left2');['Page 1','Écran mobile','  header','  card','  btn','Écran desktop'].forEach((t,i)=>o+=`<text x="12" y="${48+i*12}" font-size="7" fill="${INK}" opacity="${i===4?1:.7}" font-family="Archivo,sans-serif" xml:space="preserve">${t}</text>`);o+=`<rect x="8" y="${48+4*12-8}" width="68" height="11" rx="2" fill="#9747ff" opacity=".18"/>`}
+  const [x,y,w,h]=Z.canvas;o+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${s.id==='fig'?PAN:'#8a8a8a'}" opacity="${s.id==='fig'?1:.25}"/>`;
+  const g=sid();
+  if(s.id==='ps')o+=photo(x+18,y+16,w-36,h-32,g)+`<rect x="${x+18}" y="${y+16}" width="${w-36}" height="${h-32}" fill="none" stroke="${INK}"/><text x="${x+w/2}" y="${y+h-36}" text-anchor="middle" font-size="18" font-weight="900" fill="#fff" font-family="Archivo,sans-serif">SUMMER</text>`;
+  if(s.id==='ai')o+=`<rect x="${x+24}" y="${y+14}" width="${w-48}" height="${h-28}" fill="#fff" stroke="${LN}"/><path d="M${x+60} ${y+120}C${x+60} ${y+50} ${x+100} ${y+40} ${x+w/2} ${y+40}C${x+120} ${y+40} ${x+150} ${y+70} ${x+130} ${y+110}Z" fill="${ORA}" stroke="${BLU}" stroke-width="1.2"/>${anchor(x+60,y+120)}${anchor(x+w/2,y+40,1)}${anchor(x+130,y+110)}${handle(x+w/2,y+40,x+w/2-30,y+40)}${handle(x+w/2,y+40,x+w/2+28,y+40)}`;
+  if(s.id==='id'){const pw=(w-40)/2;[0,1].forEach(i=>{const px=x+16+i*(pw+8);o+=`<rect x="${px}" y="${y+12}" width="${pw}" height="${h-24}" fill="#fff" stroke="${INK}" stroke-width=".8"/><rect x="${px+6}" y="${y+18}" width="${pw-12}" height="${h-36}" fill="none" stroke="#c43cff" stroke-width=".6"/>`;
+    if(i===0)o+=`<rect x="${px+8}" y="${y+22}" width="${pw-16}" height="12" fill="${INK}"/>`+lines(px+8,y+42,(pw-20)/2,16,6,.7)+lines(px+12+(pw-20)/2,y+42,(pw-20)/2,16,6,.4);
+    else o+=`<rect x="${px+8}" y="${y+22}" width="${pw-16}" height="60" fill="none" stroke="${BLU}"/><path d="M${px+8} ${y+22}L${px+pw-8} ${y+82}M${px+pw-8} ${y+22}L${px+8} ${y+82}" stroke="${BLU}" stroke-width=".6"/>`+lines(px+8,y+92,pw-16,10,6,.5)})}
+  if(s.id==='fig')o+=`<text x="${x+14}" y="${y+14}" font-size="6.5" fill="${INK}" opacity=".7" font-family="Archivo,sans-serif">Écran mobile</text><g transform="translate(${x+14} ${y+18})">${phone(0,0,44,92)}<rect x="5" y="6" width="34" height="8" rx="1" fill="${INK}" opacity=".8"/><rect x="5" y="18" width="34" height="26" rx="2" fill="${BLU}" opacity=".6"/>${lines(5,50,34,4,5)}<rect x="5" y="74" width="34" height="10" rx="5" fill="${RED}" stroke="#9747ff" stroke-width="1.2"/></g><text x="${x+70}" y="${y+14}" font-size="6.5" fill="${INK}" opacity=".7" font-family="Archivo,sans-serif">Écran desktop</text><g transform="translate(${x+70} ${y+18})"><rect width="${w-84}" height="70" rx="3" fill="#fff" stroke="${INK}" stroke-width="1.2"/><rect x="5" y="5" width="${w-94}" height="7" rx="1" fill="${INK}" opacity=".8"/><rect x="5" y="16" width="${(w-94)/2}" height="40" rx="2" fill="${BLU}" opacity=".6"/>${lines(10+(w-94)/2,18,(w-94)/2-5,5,6)}</g>`;
+  for(const k of ['panel1','panel2'])if(zones.includes(k)){o+=box(k);const [px,py,pw]=Z[k];
+    if(k==='panel1'&&s.id==='ps'){['Texte','Réglage','Photo','Fond'].forEach((t,i)=>{o+=`<rect x="${px+4}" y="${py+8+i*18}" width="${pw-8}" height="15" rx="2" fill="${i===1?BLU:'none'}" opacity="${i===1?.18:1}"/><rect x="${px+7}" y="${py+10+i*18}" width="12" height="11" fill="${['#fff',PAN,'#7fb2ff','#fff'][i]}" stroke="${LN}"/>`+(i===1?`<rect x="${px+21}" y="${py+10+i*18}" width="12" height="11" fill="#000" stroke="${LN}"/><circle cx="${px+27}" cy="${py+15.5+i*18}" r="3.5" fill="#fff"/>`:'')+`<text x="${px+(i===1?36:23)}" y="${py+18+i*18}" font-size="6.5" fill="${INK}" font-family="Archivo,sans-serif">${t}</text>`})}
+    else if(k==='panel2'&&s.id==='ai'){for(let i=0;i<12;i++)o+=`<rect x="${px+6+(i%4)*16}" y="${py+10+Math.floor(i/4)*16}" width="12" height="12" fill="${['#e4002b','#1f3fd1','#ffc400','#111','#ff6a13','#00a3ff','#0a6b2f','#fff','#6a2c91','#ccc','#888','#f4d'][i]}" stroke="${LN}"/>`}
+    else if(k==='panel1'&&s.id==='id'){for(let i=0;i<3;i++)o+=`<rect x="${px+16}" y="${py+8+i*24}" width="18" height="20" fill="#fff" stroke="${LN}"/><rect x="${px+36}" y="${py+8+i*24}" width="18" height="20" fill="#fff" stroke="${i===1?BLU:LN}"/>`}
+    else if(k==='panel1'&&s.id==='fig'){o+=`<text x="${px+6}" y="${py+12}" font-size="6.5" font-weight="700" fill="${INK}" font-family="Archivo,sans-serif">Auto layout</text>`;for(let i=0;i<3;i++)o+=`<rect x="${px+6+i*21}" y="${py+18}" width="18" height="12" rx="2" fill="${i===0?'#9747ff':'none'}" stroke="${LN}" opacity="${i===0?.5:1}"/>`;o+=lines(px+6,py+40,pw-12,6,7,.6)}
+    else o+=lines(px+6,py+10,pw-12,Math.floor((Z[k][3]-14)/9),9,.6)}
+  if(zones.includes('bottom')){const [bx,by,bw,bh]=Z.bottom;o+=`<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="7" fill="${BG}" stroke="${INK}" stroke-width="1"/>`;for(let i=0;i<7;i++)o+=`<rect x="${bx+8+i*12.5}" y="${by+4}" width="6" height="6" rx="1.5" fill="${INK}" opacity="${i===0?.9:.35}"/>`}
+  s.ui.forEach((z,i)=>{const r=Z[z[1]];if(!r)return;let bx=r[0]+r[2]-8,by=r[1]+8;if(z[1]==='left'){bx=r[0]+r[2]/2;by=r[1]+r[3]-10}if(z[1]==='bottom'){bx=r[0]-10;by=r[1]+r[3]/2}if(z[1]==='top')bx=r[0]+r[2]*.55;
+    o+=`<g><circle cx="${bx}" cy="${by}" r="8.5" fill="${RED}" stroke="#fff" stroke-width="1.5"/><text x="${bx}" y="${by+3.3}" text-anchor="middle" font-size="9.5" font-weight="900" fill="#fff" font-family="Archivo,sans-serif">${i+1}</text></g>`});
+  return `<svg viewBox="0 0 320 210" role="img" aria-label="Schéma de l'interface de ${s.n}" style="color:var(--ink)">${o}</svg>`}
+
+/* raccourcis */
+const OSK='atelier-os';
+let OS=store.get(OSK,null)||(/Mac|iPhone|iPad/i.test(navigator.platform||navigator.userAgent)?'mac':'win');
+const MAP={mac:{Cmd:'⌘ Cmd',Alt:'⌥ Option',Shift:'⇧ Maj'},win:{Cmd:'Ctrl',Alt:'Alt',Shift:'⇧ Maj'}};
+function kbd(s){return s.split(/( et | \/ | puis )/).map(p=>{if(/^ (et|\/|puis) $/.test(p))return `<span class="kj">${p.trim()}</span>`;
+  let note='';const m=p.match(/^(.*?)\s*(\(.*\))$/);if(m){p=m[1];note=` <span class="kj">${m[2]}</span>`}
+  return p.split('+').map(k=>`<kbd>${esc(MAP[OS][k]||k)}</kbd>`).join('<span class="kj">+</span>')+note}).join(' ')}
+const keyList=r=>r.map(k=>`<div class="key"><span class="kk">${kbd(k[0])}</span><span>${k[1]}</span></div>`).join('');
+const plainKeys=(n,r)=>n+' — raccourcis ('+(OS==='mac'?'Mac':'Windows')+')\n'+r.map(k=>k[0].replace(/\b(Cmd|Alt|Shift)\b/g,m=>MAP[OS][m].replace(/^[⌘⌥⇧] /,''))+' : '+k[1]).join('\n');
+
+const tutoDesc=(u,soft)=>/youtube\.com\/results/.test(u)?[`Une recherche YouTube prête à l'emploi : des tutos ${soft} pour débutants, en français.`,'Choisissez une vidéo récente de moins de 20 minutes, ouvrez le logiciel à côté et refaites chaque étape.']
+  :/helpx\.adobe|help\.figma|docs\.|code\.visualstudio|help\.procreate|help\.penpot|wiki\.scribus|gimp\.org|inkscape\.org/.test(u)?['La documentation et les tutoriels officiels, du premier pas aux techniques avancées.','La source la plus fiable, toujours à jour avec la dernière version.']
+  :/youtube\.com\/@/.test(u)?[`Une chaîne YouTube de référence : des techniques expliquées pas à pas.`,'Abonnez-vous et regardez une vidéo courte par semaine : la régularité fait progresser.']
+  :/tutsplus/.test(u)?['Des centaines de tutoriels écrits et vidéo gratuits, de Photoshop au motion design.','Pratique pour chercher une technique précise.']
+  :/bezier\.method/.test(u)?["Un petit jeu en ligne pour maîtriser l'outil Plume en quelques minutes.",'La Plume est la même dans Illustrator, Photoshop, InDesign et Figma : un savoir-faire qui sert partout.']
+  :/figma\.com\/education/.test(u)?['Figma gratuit pour les élèves et les enseignants, avec des ressources de cours.','Inscrivez-vous avec votre adresse d\'école.']
+  :/designschool/.test(u)?['Des cours courts et gratuits sur le design et l\'utilisation de Canva.','']
+  :/grafikart/.test(u)?['Des tutoriels vidéo gratuits en français sur le développement web.','']
+  :/blackmagicdesign/.test(u)?['Les formations officielles gratuites de DaVinci Resolve, avec livres et fichiers d\'exercice.','']
+  :[`Pour apprendre ${soft}.`,''];
+const tutoRow=(t,soft)=>{const d=tutoDesc(t[1],soft);return [t[0],t[1],d[0],d[1],t[2]]};
+function swPanel(s){return `<div class="sw-head" style="--c:${s.c}"><div><span class="eyebrow">${s.ed} · ${s.cat}</span><h3 class="sw-n">${s.n}</h3><p style="margin:6px 0 0;font-size:18px">${s.role}</p><p class="small" style="margin:8px 0 0"><b>À éviter pour : </b>${s.pas}</p></div></div>
+  <div class="sw-ui sec"><figure class="uifig">${uiSchema(s)}<figcaption class="small">Schéma simplifié de l'interface : la disposition exacte change selon la version et vos réglages.</figcaption></figure><div><h3 style="margin-bottom:10px">Repérez-vous</h3><ol class="uileg">${s.ui.map(z=>`<li>${z[0]}</li>`).join('')}</ol><p class="small" style="margin-top:12px">Perdu ? Menu <b>Fenêtre</b> pour rouvrir un panneau fermé${s.id==='fig'?'':', puis <b>Espace de travail › Réinitialiser</b> pour tout remettre en place'}.</p></div></div>
+  <div class="sec rule"><h3 style="margin-bottom:6px">Les 6 notions à comprendre</h3><p class="lead" style="margin-bottom:16px">Comprenez ces idées et le reste du logiciel devient logique.</p><div class="concepts">${s.cles.map(k=>`<div class="concept"><div class="ill">${ill(k[2])}</div><h4>${k[0]}</h4><p>${k[1]}</p></div>`).join('')}</div></div>
+  <div class="grid2 sec"><div class="rule"><h3 style="margin-bottom:10px">Pour bien commencer</h3><ol class="qbrief">${s.debut.map(x=>`<li>${x}</li>`).join('')}</ol></div><div class="rule"><h3 style="margin-bottom:10px">Les erreurs de débutant</h3><ul class="errs">${s.err.map(x=>`<li>${x}</li>`).join('')}</ul></div></div>
+  <div class="sec rule"><div class="head" style="margin-bottom:12px"><h3>Raccourcis indispensables</h3><button class="btn sm" data-kcopy="${s.id}">Copier la liste</button></div><div class="keys" data-keys="${s.id}">${keyList(s.rac)}</div></div>
+  <div class="sec rule"><h3 style="margin-bottom:16px">Tutos gratuits pour apprendre ${s.n}</h3><div class="refs">${s.tutos.map(t=>refCard(tutoRow(t,s.n))).join('')}</div></div>`}
+function otherPanel(){return `<p class="lead" style="margin-bottom:20px">L'essentiel pour démarrer avec les autres logiciels du métier : à quoi ils servent, trois conseils, les raccourcis à connaître et où apprendre gratuitement.</p><div class="soft2">${SOFT2.map((x,i)=>`<article class="s2"><div class="s2h"><div><span class="eyebrow">${x[1]} · ${x[2]}</span><h3>${x[0]}</h3></div></div><p style="margin:0;font-size:17px">${x[3]}</p><ul class="errs ok">${x[4].map(t=>`<li>${t}</li>`).join('')}</ul><div class="keys sm" data-keys2="${i}">${keyList(x[5])}</div><div class="acts">${x[6].map(t=>`<a class="btn sm" href="${t[1]}" target="_blank" rel="noopener">${t[0]} ↗</a>`).join('')}</div></article>`).join('')}</div>`}
+function choosePanel(){const seen=new Set(),all=[];
+  SOFT.forEach(s=>s.tutos.forEach(t=>{if(!/results\?search/.test(t[1])&&!seen.has(t[1])){seen.add(t[1]);all.push(tutoRow(t,s.n))}}));
+  SOFT2.forEach(s=>s[6].forEach(t=>{if(!/results\?search/.test(t[1])&&!seen.has(t[1])){seen.add(t[1]);all.push(tutoRow(t,s[0]))}}));
+  return `<div class="grid2"><div><h3 style="margin-bottom:12px">Quel logiciel pour quel projet ?</h3><div class="scroll"><table class="tstack"><thead><tr><th>Projet</th><th>Logiciel</th></tr></thead><tbody>${QUOI.map(r=>`<tr><td data-l="Projet"><b>${r[0]}</b></td><td data-l="Logiciel">${r[1]}</td></tr>`).join('')}</tbody></table></div>
+  <p class="small" style="margin-top:12px">La règle d'or : <b>pixels</b> → Photoshop, <b>vecteurs</b> → Illustrator, <b>pages</b> → InDesign, <b>écrans</b> → Figma.</p></div>
+  <div><h3 style="margin-bottom:12px">Les alternatives gratuites</h3><div class="alts">${ALT.map(a=>`<a class="alt" href="${a[2]}" target="_blank" rel="noopener"><span class="small">remplace ${a[0]}</span><b>${a[1]} ↗</b><span>${a[3]}</span></a>`).join('')}</div>
+  <p class="small" style="margin-top:12px">Élèves et enseignants : Adobe et Figma proposent des offres éducation, renseignez-vous auprès de votre école.</p></div></div>
+  <div class="sec rule"><h3 style="margin-bottom:6px">Tous les sites de tutos gratuits</h3><p class="lead" style="margin-bottom:16px">Les ressources officielles et les meilleures chaînes, réunies au même endroit. Ajoutez-les à votre espace avec ☆.</p><div class="refs">${all.map(refCard).join('')}</div></div>`}
+
+let lgTab='ps';
+function lgShow(){$$('#lgTabs .btn').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lg===lgTab));const p=$('#lgPanel');
+  const s=SOFT.find(x=>x.id===lgTab);p.innerHTML=s?swPanel(s):lgTab==='autres'?otherPanel():choosePanel();
+  $$('#lgOs .btn').forEach(b=>b.setAttribute('aria-pressed',b.dataset.os===OS))}
+onShow.logiciels=()=>{if(!$('#lgPanel').innerHTML)lgShow()};
+$('#lgTabs').addEventListener('click',e=>{const b=e.target.closest('[data-lg]');if(!b)return;lgTab=b.dataset.lg;lgShow()});
+$('#lgOs').addEventListener('click',e=>{const b=e.target.closest('[data-os]');if(!b)return;OS=b.dataset.os;store.set(OSK,OS);
+  $$('#lgOs .btn').forEach(x=>x.setAttribute('aria-pressed',x.dataset.os===OS));
+  $$('[data-keys]').forEach(el=>{const s=SOFT.find(x=>x.id===el.dataset.keys);if(s)el.innerHTML=keyList(s.rac)});
+  $$('[data-keys2]').forEach(el=>el.innerHTML=keyList(SOFT2[+el.dataset.keys2][5]))});
+$('#lgPanel').addEventListener('click',e=>{const b=e.target.closest('[data-kcopy]');if(!b)return;const s=SOFT.find(x=>x.id===b.dataset.kcopy);copy(plainKeys(s.n,s.rac),'Raccourcis copiés')});
+
 renderDay();route();
 if(!auth)renderAcct();
 })();

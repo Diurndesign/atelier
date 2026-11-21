@@ -20,7 +20,7 @@
     <button class="btn sm" id="acctBtn">Se connecter</button>
   </div>
   <nav class="tabs" aria-label="Onglets">
-    <a href="#aujourdhui">Aujourd'hui</a><a href="#artistes">Artistes</a><a href="#couleurs">Couleurs</a><a href="#symbolique">Symbolique</a><a href="#composition">Composition</a><a href="#logos">Logos</a><a href="#typo">Typo</a><a href="#methode">Méthode</a><a href="#lexique">Lexique</a><a href="#outils">Outils</a><a href="#code">Code</a><a href="#references">Boîte à outils</a><a href="#espace">Mon espace <span class="count" id="favCount">0</span></a>
+    <a href="#aujourdhui">Aujourd'hui</a><a href="#artistes">Artistes</a><a href="#couleurs">Couleurs</a><a href="#symbolique">Symbolique</a><a href="#composition">Composition</a><a href="#logos">Logos</a><a href="#typo">Typo</a><a href="#methode">Méthode</a><a href="#logiciels">Logiciels</a><a href="#lexique">Lexique</a><a href="#outils">Outils</a><a href="#code">Code</a><a href="#references">Boîte à outils</a><a href="#espace">Mon espace <span class="count" id="favCount">0</span></a>
   </nav>
 </header>
 
@@ -307,6 +307,14 @@
   <div class="mtp" id="mt-metier" hidden><p class="lead" style="margin-bottom:20px">Les bases pour travailler en indépendant en France. Informations générales, à vérifier auprès de l'Urssaf ou d'un expert-comptable.</p><div class="figs" id="metier"></div></div>
 </div></section>
 
+<!-- ================= LOGICIELS ================= -->
+<section class="tab band" id="t-logiciels" hidden><div class="wrap">
+  <div class="head"><div><h2>Logiciels</h2><p class="lead" style="margin-top:10px">Toutes les clés pour prendre en main les logiciels du graphiste et du webdesigner : l'interface expliquée, les notions à comprendre en images, les raccourcis indispensables, les erreurs à éviter et des tutos gratuits.</p></div>
+    <div class="seg" id="lgOs" role="group" aria-label="Raccourcis pour"><span class="small" style="align-self:center;margin-right:4px">Raccourcis :</span><button class="btn sm" data-os="mac" aria-pressed="false">Mac</button><button class="btn sm" data-os="win" aria-pressed="false">Windows</button></div></div>
+  <div class="seg" id="lgTabs" role="tablist" style="margin-bottom:28px"><button class="btn" data-lg="ps" aria-pressed="true">Photoshop</button><button class="btn" data-lg="ai" aria-pressed="false">Illustrator</button><button class="btn" data-lg="id" aria-pressed="false">InDesign</button><button class="btn" data-lg="fig" aria-pressed="false">Figma</button><button class="btn" data-lg="autres" aria-pressed="false">Autres logiciels</button><button class="btn" data-lg="choisir" aria-pressed="false">Lequel choisir ?</button></div>
+  <div id="lgPanel"></div>
+</div></section>
+
 <!-- ================= LEXIQUE ================= -->
 <section class="tab band" id="t-lexique" hidden><div class="wrap">
   <div class="head"><div><h2>Lexique du graphiste</h2><p class="lead" style="margin-top:10px"><span id="lexN"></span> mots du métier, de la couleur à l'impression, du web aux mouvements artistiques. Mettez en favori ceux à réviser, puis testez-vous.</p></div>
@@ -423,6 +431,7 @@
 <script src="js/data2.js"></script>
 <script src="js/data3.js"></script>
 <script src="js/data4.js"></script>
+<script src="js/data5.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
