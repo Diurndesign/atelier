@@ -157,13 +157,15 @@ async function workImgs(x,max,strict){
   const {a,c}=x;const clean=a[0].replace(/\s*\(.*?\)/g,'');const sur=/&|teamLab|JODI|Grapus|Nendo|Experimental|M\/M|SANAA|Formafantasma|Studio|Architects|Chermayeff/i.test(a[0])?clean:clean.split(' ').pop();
   const qs=works(a).slice(0,3).map(w=>w.t.replace(/\s*\(.*?\)/g,'')+' '+sur);if(!strict)qs.push(clean+' '+(CQ[c.k]||'artwork'));
   let res=[];try{res=(await Promise.all(qs.map(q=>commons(q,strict?4:6).catch(()=>[])))).flat()}catch(e){}
-  const seen=new Set(),nm=norm(clean).replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim(),ns=norm(sur).replace(/[^a-z ]/g,' ').trim(),out=[];
+  const ww=works(a).flatMap(w=>norm(w.t).replace(/[^a-z ]/g,' ').split(' ')).filter(w=>w.length>=5);const seen=new Set(),nm=norm(clean).replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim(),ns=norm(sur).replace(/[^a-z ]/g,' ').trim(),out=[];
   for(const p of res){if(seen.has(p.pageid))continue;seen.add(p.pageid);const i=p.imageinfo&&p.imageinfo[0];if(!i||!i.thumburl)continue;
     const title=p.title.replace(/^File:/,'').replace(/\.[^.]+$/,'');const md=i.extmetadata||{};
     const txt=title+' '+(md.Categories?.value||'')+' '+stripTags(md.ImageDescription?.value);
     if(BAD.test(txt))continue;
     const tn=norm(title).replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim();if(tn===nm||tn.replace(/ \w$/,'')===nm)continue;
-    if(strict&&(!ns||!norm(txt).replace(/[^a-z ]/g,' ').includes(ns)||(i.width&&i.width<400)))continue;
+    if(strict){const nt=norm(txt).replace(/[^a-z ]/g,' ').replace(/\s+/g,' '),tw=tn;
+      const okT=ns&&tw.includes(ns)&&(ns.length>=5||nt.includes(nm));const okW=nt.includes(nm)&&ww.some(w=>tw.includes(w));
+      if(!(okT||okW)||(i.width&&i.width<400))continue}
     out.push({title,thumb:i.thumburl,big:(i.width&&i.width<=1600)?i.url:i.thumburl.replace(/\/\d+px-/,'/1280px-'),page:i.descriptionurl,author:stripTags(md.Artist?.value)||'Auteur non précisé',lic:md.LicenseShortName?.value||'Licence libre'});
     if(out.length>=max)break}
   return out}
