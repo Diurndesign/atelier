@@ -102,7 +102,7 @@ document.addEventListener('click',e=>{
 $$('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d)d.close()}));
 
 /* ---------- router ---------- */
-const TABS=['aujourdhui','artistes','couleurs','symbolique','composition','logos','typo','lexique','outils','code','references','espace'];
+const TABS=['aujourdhui','artistes','couleurs','symbolique','composition','logos','typo','methode','lexique','outils','code','references','espace'];
 const onShow={};
 function route(){let t=location.hash.slice(1);if(!TABS.includes(t))t='aujourdhui';current=t;
   $$('.tab').forEach(s=>s.hidden=s.id!=='t-'+t);
@@ -418,6 +418,35 @@ const COLTIP=`<div class="coltip"><div><h4>Récupérer une couleur en code</h4><
 onShow.references=()=>{const pdf=RES.slice(0,9),n=pdf.reduce((t,g)=>t+g[2].length,0),fr=pdf.reduce((t,g)=>t+g[2].filter(r=>r[4]==='FR').length,0);
   $('#refStats').innerHTML=`<div><b>${n}</b>sites</div><div><b>9</b>catégories</div><div><b>${fr}</b>en français</div><div><b>${RES.reduce((t,g)=>t+g[2].length,0)-n}</b>compléments Atelier</div>`;
   $('#refs').innerHTML=RES.map((g,i)=>`${i===9?'<h2 class="sec" style="font-size:32px">Pour aller plus loin</h2>':''}<div class="sec rule" id="rg${i}" style="${i?'':'margin-top:0'}"><h3>${i<9?`<span class="eyebrow" style="margin-right:10px">0${i+1} / 9</span>`:''}${g[0]}</h3><p class="lead" style="margin:6px 0 16px">${g[1]}</p><div class="refs">${g[2].map(refCard).join('')}</div>${g[0]==='Couleurs'?COLTIP:''}</div>`).join('')};
+
+/* ---------- méthode ---------- */
+$('#mTabs').addEventListener('click',e=>{const b=e.target.closest('[data-mt]');if(!b)return;$$('#mTabs .btn').forEach(x=>x.setAttribute('aria-pressed',x===b));$$('.mtp').forEach(p=>p.hidden=p.id!=='mt-'+b.dataset.mt)});
+const CK='atelier-check';
+function renderChecks(){const st=store.get(CK,{});let n=0,t=0;
+  $('#checks').innerHTML=CHECK.map((g,gi)=>`<fieldset><legend>${g[0]}</legend>${g[1].map((it,ii)=>{const k=gi+'-'+ii,on=!!st[k];t++;if(on)n++;return `<label><input type="checkbox" data-ck="${k}"${on?' checked':''}><span>${esc(it)}</span></label>`}).join('')}</fieldset>`).join('');
+  $('#ckScore').textContent=n+' / '+t}
+$('#checks').addEventListener('change',e=>{const k=e.target.dataset.ck;if(!k)return;const st=store.get(CK,{});if(e.target.checked)st[k]=1;else delete st[k];store.set(CK,st);const n=Object.keys(st).length;$('#ckScore').textContent=n+' / '+CHECK.reduce((t,g)=>t+g[1].length,0)});
+$('#ckReset').onclick=()=>{store.del(CK);renderChecks()};
+$('#briefCopy').onclick=()=>copy(BRIEF.map((q,i)=>(i+1)+'. '+q).join('\n'),'Questions copiées');
+const row3=r=>`<tr><td data-l="${r===0?'':''}"><b>${r[0]}</b></td><td class="n">${r[1]}</td><td>${r[2]}</td></tr>`;
+let methInit=false;
+onShow.methode=()=>{
+  $('#gestalt').innerHTML=GESTALT.map(g=>`<div class="forme"><svg viewBox="0 0 100 56" style="width:120px;height:68px;fill:none;stroke:none;color:var(--ink)" aria-hidden="true">${g[3]}</svg><h4>${g[0]} ${favBtn('term','Gestalt : '+g[0],'Gestalt : '+g[0],{},true)}</h4><p>${g[1]}</p><p class="small">${g[2]}</p></div>`).join('');
+  $('#heur').innerHTML=HEUR.map((x,i)=>`<div class="num"><div class="top2"><b class="n">${i+1}</b>${favBtn('term','Heuristique : '+x[0],'Heuristique : '+x[0],{},true)}</div><h4>${x[0]}</h4><p>${x[1]}</p><p class="small"><b>Exemple : </b>${x[2]}</p></div>`).join('');
+  $('#lois').innerHTML=LOIS.map(x=>`<div class="fig2"><h4 style="display:flex;justify-content:space-between;gap:8px;align-items:center">${x[0]} ${favBtn('term','Loi UX : '+x[0],'Loi UX : '+x[0],{},true)}</h4><p>${x[1]}</p><p class="small"><b>En pratique : </b>${x[2]}</p></div>`).join('');
+  $('#uirep').innerHTML=UIREP.map(x=>`<div><span>${x[0]}</span><b>${x[1]}</b><p>${x[2]}</p></div>`).join('');
+  const EST=[["var(--ink)","var(--bg)",""],["var(--red)","#fff",""],["var(--ink)","var(--bg)","outline:3px solid var(--blue);outline-offset:3px"],["#000","#fff","transform:scale(.96)"],["var(--panel)","var(--mute)","border-color:var(--line)"],["var(--ink)","var(--bg)","opacity:.8"],["var(--bg)","var(--red)","border-color:var(--red)"],["#0a6b2f","#fff",""],["var(--bg)","var(--mute)","border:2px dashed var(--line)"]];
+  const LBL=["Envoyer","Envoyer","Envoyer","Envoyer","Envoyer","Envoi…","Réessayer","✓ Envoyé","Aucun projet"];
+  $('#etats').innerHTML=ETATS.map((x,i)=>`<div class="etat"><span class="demo-btn" style="background:${EST[i][0]};color:${EST[i][1]};${EST[i][2]}">${LBL[i]}</span><div><b>${x[0]}</b><p class="small" style="margin:2px 0 0">${x[1]}</p></div></div>`).join('');
+  const tr=(r,l)=>`<tr><td data-l="${l[0]}"><b>${r[0]}</b></td><td data-l="${l[1]}" class="n">${r[1]}</td><td data-l="${l[2]}">${r[2]}</td></tr>`;
+  $('#fSoc').innerHTML=FMT_SOCIAL.map(r=>tr(r,['Support','Taille','À savoir'])).join('');
+  $('#fWeb').innerHTML=FMT_WEB.map(r=>tr(r,['Élément','Taille','À savoir'])).join('');
+  $('#fFiles').innerHTML=FMT_FILES.map(r=>tr(r,['Format','Pour','À savoir'])).join('');
+  renderChecks();
+  $('#etapes').innerHTML=ETAPES.map(x=>`<li><h4>${x[0]}</h4><p>${x[1]}</p><p class="small"><b>Livrable : </b>${x[2]}</p></li>`).join('');
+  $('#brief').innerHTML=BRIEF.map(q=>`<li>${q}</li>`).join('');
+  $('#etapesWeb').innerHTML=ETAPES_WEB.map(q=>`<li>${q}</li>`).join('');
+  $('#metier').innerHTML=METIER.map(x=>`<div class="fig2"><h4>${x[0]}</h4><p>${x[1]}</p></div>`).join('')};
 
 /* ---------- code ---------- */
 const bip=c=>`<svg viewBox="0 0 96 96" aria-hidden="true"><line x1="48" y1="6" x2="48" y2="20" stroke="#111" stroke-width="4"/><circle cx="48" cy="6" r="5" fill="#e4002b"/><rect x="18" y="20" width="60" height="46" rx="12" fill="#fff" stroke="#111" stroke-width="4"/><circle cx="36" cy="42" r="7" fill="#111"/><circle cx="60" cy="42" r="7" fill="#111"/><rect x="36" y="54" width="24" height="5" rx="2.5" fill="${c}"/><rect x="28" y="70" width="40" height="20" rx="6" fill="#111"/></svg>`;
