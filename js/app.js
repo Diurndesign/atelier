@@ -127,7 +127,8 @@ let off=0;
 function dayN(){const d=new Date();d.setDate(d.getDate()+off);return [d,Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5)]}
 function renderDay(){const [d,n]=dayN();
   $('#date').textContent=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});$('#today').hidden=off===0;
-  $('#plates').innerHTML=CATS.map((c,i)=>plate(BYID.get(c.k+':'+c.list[(n+i*7)%c.list.length][0]))).join('');
+  $('#plates').innerHTML=CATS.slice(0,4).map((c,i)=>plate(BYID.get(c.k+':'+c.list[(n+i*7)%c.list.length][0]))).join('');
+  $('#also').innerHTML=CATS.slice(4).map((c,i)=>acard(BYID.get(c.k+':'+c.list[(n*3+i*5)%c.list.length][0]))).join('');
   $('#exo').textContent=EXO[n%EXO.length];
   const t=LEX[(n*7)%LEX.length];
   $('#word').innerHTML=`<span class="eyebrow">Mot du jour · ${t[1]}</span><b class="t">${t[0]}</b><p style="margin:0;font-size:17px">${t[2]}</p><div class="acts">${favBtn('term',t[0],t[0],{},false)}<a class="btn sm" href="#lexique">Tout le lexique</a></div>`;
@@ -136,6 +137,7 @@ $('#prev').onclick=()=>{off--;renderDay()};$('#next').onclick=()=>{off++;renderD
 document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('.art[data-open-artist]')){e.preventDefault();openArtist(e.target.dataset.openArtist)}});
 
 /* artist modal + Wikimedia Commons */
+const CQ={web:'digital art',gra:'poster',art:'artwork',des:'design',pei:'painting',pho:'photograph',arc:'building',ill:'illustration',mod:'fashion'};
 const BAD=/portrait|porträt|retrato|ritratto|interview|conference|conférence|lecture|award|ceremony|cérémonie|press |selfie|headshot|signature|grave|tomb|tombe|speaking|book signing|meeting|visite officielle|in \d{4}\b|en \d{4}\b|\(\d{4}\)$/i;
 const stripTags=h=>{const d=document.createElement('div');d.innerHTML=h||'';return (d.textContent||'').replace(/\s+/g,' ').trim()};
 let galTok=0;
@@ -143,8 +145,8 @@ async function commons(q,limit){const u='https://commons.wikimedia.org/w/api.php
   const r=await fetch(u);if(!r.ok)return [];const j=await r.json();return Object.values(j.query?.pages||{}).sort((a,b)=>a.index-b.index)}
 async function loadGallery(x){
   const tok=++galTok,{a,c}=x,gal=$('#gal');
-  const clean=a[0].replace(/\s*\(.*?\)/g,'');const sur=/ et |collectif|studio|teamLab|JODI|Grapus|Nendo|Experimental|M\/M/i.test(a[0]+a[1])?clean.split(' et ')[0]:clean.split(' ').pop();
-  const qs=works(a).slice(0,3).map(w=>w.t.replace(/\s*\(.*?\)/g,'')+' '+sur);qs.push(clean+(c.k==='des'?' design':c.k==='gra'?' poster':' artwork'));
+  const clean=a[0].replace(/\s*\(.*?\)/g,'');const sur=/&|teamLab|JODI|Grapus|Nendo|Experimental|M\/M|SANAA|Formafantasma|Studio|Architects|Chermayeff/i.test(a[0])?clean:clean.split(' ').pop();
+  const qs=works(a).slice(0,3).map(w=>w.t.replace(/\s*\(.*?\)/g,'')+' '+sur);qs.push(clean+' '+(CQ[c.k]||'artwork'));
   let res=[];try{res=(await Promise.all(qs.map(q=>commons(q,6).catch(()=>[])))).flat()}catch(e){}
   if(tok!==galTok)return;
   const seen=new Set(),nm=norm(clean).replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim(),out=[];
@@ -166,15 +168,24 @@ function openArtist(id){const x=BYID.get(id);if(!x)return;const {a,c}=x,w=works(
   if(!M.open)M.showModal();M.querySelector('.dlg-body').scrollTop=0;M.scrollTop=0;loadGallery(x)}
 
 /* repertoire */
-let af='all';
+let af='all',aPage=1;const PER=48;
 $('#artN').textContent=ALL.length;
 $('#af').innerHTML=[['all','Tous'],...CATS.map(c=>[c.k,c.n]),['fav','★ Mes favoris']].map(([k,n])=>`<button class="btn sm" data-af="${k}" aria-pressed="${k==='all'}">${n}</button>`).join('');
-$('#af').addEventListener('click',e=>{const b=e.target.closest('[data-af]');if(!b)return;af=b.dataset.af;$$('#af .btn').forEach(x=>x.setAttribute('aria-pressed',x===b));renderArtists()});
-$('#aq').addEventListener('input',()=>renderArtists());
-const acard=x=>`<article class="acard" style="--c:${x.c.c};--on:${x.c.on}"><div class="art" data-open-artist="${esc(x.id)}" role="button" tabindex="0" aria-label="Ouvrir ${esc(x.a[0])}">${art(x.a[0],x.c)}<span class="cat">${x.c.n}</span></div><div class="in"><button class="open" data-open-artist="${esc(x.id)}"><h4>${x.a[0]}</h4></button><p class="meta" style="margin:0">${x.a[3]} · ${x.a[1]}</p><div class="acts"><button class="btn sm" data-open-artist="${esc(x.id)}">Ouvrir la fiche</button>${artFav(x,true)}</div></div></article>`;
-function renderArtists(){const q=norm($('#aq').value.trim());
-  const l=ALL.filter(x=>(af==='all'||af===x.c.k||(af==='fav'&&favs.has(fid('artist',x.id))))&&(!q||norm(x.a.join(' ')+' '+x.c.n).includes(q))).sort((p,r)=>p.a[0].localeCompare(r.a[0],'fr'));
-  $('#agrid').innerHTML=l.length?l.map(acard).join(''):`<p class="empty" style="grid-column:1/-1">${af==='fav'?'Aucun artiste en favori : cliquez ☆ sur une fiche.':'Aucun résultat.'}</p>`}
+$('#af').addEventListener('click',e=>{const b=e.target.closest('[data-af]');if(!b)return;af=b.dataset.af;aPage=1;$$('#af .btn').forEach(x=>x.setAttribute('aria-pressed',x===b));renderArtists()});
+$('#aq').addEventListener('input',()=>{aPage=1;renderArtists()});
+$('#asort').addEventListener('input',()=>{aPage=1;renderArtists()});
+$('#aMore').onclick=()=>{aPage++;renderArtists(true)};
+$('#inspire').onclick=()=>{const x=ALL[Math.floor(Math.random()*ALL.length)];openArtist(x.id)};
+const year=x=>{const m=String(x.a[1]).match(/\d{3,4}/);return m?+m[0]:9999};
+const acard=x=>`<article class="acard" style="--c:${x.c.c};--on:${x.c.on}"><div class="art" data-open-artist="${esc(x.id)}" role="button" tabindex="0" aria-label="Ouvrir ${esc(x.a[0])}">${art(x.a[0],x.c)}<span class="cat">${x.c.n}</span></div><div class="in"><button class="open" data-open-artist="${esc(x.id)}"><h4>${x.a[0]}</h4></button><p class="meta" style="margin:0">${x.a[3]} · ${x.a[1]} · ${x.a[2]}</p><div class="acts"><button class="btn sm" data-open-artist="${esc(x.id)}">Ouvrir la fiche</button>${artFav(x,true)}</div></div></article>`;
+function renderArtists(more){const q=norm($('#aq').value.trim()),so=$('#asort').value;
+  let l=ALL.filter(x=>(af==='all'||af===x.c.k||(af==='fav'&&favs.has(fid('artist',x.id))))&&(!q||norm(x.a.join(' ')+' '+x.c.n).includes(q)));
+  if(so==='az')l.sort((p,r)=>p.a[0].localeCompare(r.a[0],'fr'));
+  else if(so==='chrono')l.sort((p,r)=>year(p)-year(r));
+  else{const r=rng(dayN()[1]+7);l=l.map(x=>[r(),x]).sort((p,s)=>p[0]-s[0]).map(p=>p[1])}
+  const shown=l.slice(0,aPage*PER);$('#aCount').textContent=l.length+' fiche'+(l.length>1?'s':'');
+  $('#agrid').innerHTML=shown.length?shown.map(acard).join(''):`<p class="empty" style="grid-column:1/-1">${af==='fav'?'Aucun artiste en favori : cliquez ☆ sur une fiche.':'Aucun résultat.'}</p>`;
+  $('#aMore').hidden=shown.length>=l.length;$('#aMore').textContent='Afficher plus ('+(l.length-shown.length)+' restantes)'}
 onShow.artistes=renderArtists;
 
 /* ---------- colour ---------- */

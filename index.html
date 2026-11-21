@@ -33,6 +33,7 @@
     <div class="datebar"><button class="btn" id="prev" aria-label="Jour précédent">←</button><strong id="date">…</strong><button class="btn" id="next" aria-label="Jour suivant">→</button><button class="btn" id="today" hidden>Aujourd'hui</button></div>
   </div>
   <div class="plates" id="plates"></div>
+  <div class="sec"><h3 style="margin-bottom:14px">Et aussi aujourd'hui</h3><div class="agrid" id="also"></div></div>
   <div class="daily">
     <div class="word" id="word"></div>
     <div class="exo"><b>Exercice du jour</b><p id="exo" style="font-size:17px;margin:0"></p></div>
@@ -41,9 +42,13 @@
 
 <!-- ================= ARTISTES ================= -->
 <section class="tab band" id="t-artistes" hidden><div class="wrap">
-  <div class="head"><div><h2>Le répertoire</h2><p class="lead" style="margin-top:10px"><span id="artN"></span> fiches d'artistes, graphistes et designers. Ouvrez une fiche pour voir les œuvres en images libres, et ajoutez vos préférés à votre espace.</p></div></div>
-  <div class="tools"><input type="search" id="aq" placeholder="Chercher un nom, un mouvement, un pays, une œuvre…" aria-label="Rechercher un artiste"><div class="seg" id="af"></div></div>
+  <div class="head"><div><h2>Le répertoire</h2><p class="lead" style="margin-top:10px"><span id="artN"></span> fiches : peintres, graphistes, designers, photographes, architectes, illustrateurs, créateurs de mode, artistes du web et de l'art contemporain, de la Renaissance à aujourd'hui et du Japon au Mali. Mélangez les cultures : c'est là que naît l'inspiration.</p></div>
+  <button class="btn solid" id="inspire">Inspire-moi (au hasard)</button></div>
+  <div class="tools"><input type="search" id="aq" placeholder="Chercher un nom, un mouvement, un pays, une œuvre…" aria-label="Rechercher un artiste"><select id="asort" style="width:auto" aria-label="Ordre"><option value="mix">Mélangé</option><option value="az">De A à Z</option><option value="chrono">Chronologique</option></select></div>
+  <div class="seg" id="af" style="margin-bottom:18px"></div>
+  <p class="small" id="aCount" style="margin:-6px 0 12px"></p>
   <div class="agrid" id="agrid"></div>
+  <p style="text-align:center;margin-top:20px"><button class="btn" id="aMore" hidden>Afficher plus</button></p>
 </div></section>
 
 <!-- ================= COULEURS ================= -->
@@ -363,6 +368,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="js/data.js"></script>
+<script src="js/data2.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
