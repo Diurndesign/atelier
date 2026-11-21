@@ -162,7 +162,7 @@ async function workImgs(x,max,strict){
     const title=p.title.replace(/^File:/,'').replace(/\.[^.]+$/,'');const md=i.extmetadata||{};
     const txt=title+' '+(md.Categories?.value||'')+' '+stripTags(md.ImageDescription?.value);
     if(BAD.test(txt))continue;
-    const tn=norm(title).replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim();if(tn===nm||tn.replace(/ \w$/,'')===nm)continue;
+    const tn=norm(title).replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim();const tn2=tn.replace(/\b(cropped|crop|jpg|\d+)\b/g,' ').replace(/\s+/g,' ').trim();if(tn===nm||tn.replace(/ \w$/,'')===nm||tn2===nm||tn2.replace(/ \w$/,'')===nm)continue;
     if(strict){const nt=norm(txt).replace(/[^a-z ]/g,' ').replace(/\s+/g,' '),tw=tn;
       const okT=ns&&tw.includes(ns)&&(ns.length>=5||nt.includes(nm));const okW=nt.includes(nm)&&ww.some(w=>tw.includes(w));
       if(!(okT||okW)||(i.width&&i.width<400))continue}
