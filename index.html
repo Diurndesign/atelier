@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atelier · boîte à outils du graphiste</title>
+<meta name="description" content="Culture visuelle, couleurs, typographie, composition, logos, lexique et outils du quotidien pour graphistes et designers.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 2'%3E%3Crect width='1' height='1' fill='%23e4002b'/%3E%3Crect x='1' width='1' height='1' fill='%23ffc400'/%3E%3Crect y='1' width='1' height='1' fill='%231f3fd1'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%23ff6a13'/%3E%3C/svg%3E">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><marker id="arr" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="3.5" markerHeight="3.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#0094ff"/></marker></defs></svg>
+
+<header class="top">
+  <div class="bar">
+    <a class="brand" href="#aujourdhui"><i><b></b><b></b><b></b><b></b></i>Atelier <small>la boîte à outils du graphiste</small></a>
+    <button class="btn sm" id="acctBtn">Se connecter</button>
+  </div>
+  <nav class="tabs" aria-label="Onglets">
+    <a href="#aujourdhui">Aujourd'hui</a><a href="#artistes">Artistes</a><a href="#couleurs">Couleurs</a><a href="#symbolique">Symbolique</a><a href="#composition">Composition</a><a href="#logos">Logos</a><a href="#typo">Typo</a><a href="#lexique">Lexique</a><a href="#outils">Outils</a><a href="#references">Références</a><a href="#espace">Mon espace <span class="count" id="favCount">0</span></a>
+  </nav>
+</header>
+
+<main>
+<!-- ================= AUJOURD'HUI ================= -->
+<section class="tab band" id="t-aujourdhui"><div class="wrap">
+  <div class="head">
+    <div><h1>L'atelier du jour</h1>
+    <p class="lead" style="margin-top:10px">Chaque jour : un artiste du web, un graphiste, un artiste contemporain, un designer, un mot de vocabulaire et un exercice. Cliquez sur une fiche pour voir les œuvres.</p></div>
+    <div class="datebar"><button class="btn" id="prev" aria-label="Jour précédent">←</button><strong id="date">…</strong><button class="btn" id="next" aria-label="Jour suivant">→</button><button class="btn" id="today" hidden>Aujourd'hui</button></div>
+  </div>
+  <div class="plates" id="plates"></div>
+  <div class="daily">
+    <div class="word" id="word"></div>
+    <div class="exo"><b>Exercice du jour</b><p id="exo" style="font-size:17px;margin:0"></p></div>
+  </div>
+</div></section>
+
+<!-- ================= ARTISTES ================= -->
+<section class="tab band" id="t-artistes" hidden><div class="wrap">
+  <div class="head"><div><h2>Le répertoire</h2><p class="lead" style="margin-top:10px"><span id="artN"></span> fiches d'artistes, graphistes et designers. Ouvrez une fiche pour voir les œuvres en images libres, et ajoutez vos préférés à votre espace.</p></div></div>
+  <div class="tools"><input type="search" id="aq" placeholder="Chercher un nom, un mouvement, un pays, une œuvre…" aria-label="Rechercher un artiste"><div class="seg" id="af"></div></div>
+  <div class="agrid" id="agrid"></div>
+</div></section>
+
+<!-- ================= COULEURS ================= -->
+<section class="tab band" id="t-couleurs" hidden><div class="wrap">
+  <div class="head"><div><h2>Le cercle chromatique</h2>
+  <p class="lead" style="margin-top:10px">Choisissez une couleur de base, puis une harmonie : l'outil montre les couleurs qui vont avec, leurs codes, un essai sur affiche. Enregistrez les palettes qui vous plaisent.</p></div>
+  <div class="seg" role="group" aria-label="Type de cercle"><button class="btn" data-mode="ryb" aria-pressed="true">Cercle du peintre (RJB)</button><button class="btn" data-mode="rgb" aria-pressed="false">Cercle de l'écran (RVB)</button></div></div>
+  <div class="wheelbox">
+    <div class="wheel" id="wheel"></div>
+    <div class="ctrl">
+      <div class="seg" id="harm" role="group" aria-label="Harmonie"></div>
+      <p id="hnote" style="margin:0"></p>
+      <div class="row"><label for="hA">Teinte</label><input type="range" id="hA" min="0" max="359" value="240"><output id="oA"></output></div>
+      <div class="row"><label for="hS">Saturation</label><input type="range" id="hS" min="0" max="100" value="80"><output id="oS"></output></div>
+      <div class="row"><label for="hL">Luminosité</label><input type="range" id="hL" min="10" max="90" value="50"><output id="oL"></output></div>
+      <div class="swatches" id="sw"></div>
+      <div class="savebar"><input type="text" id="palName" placeholder="Nom de la palette (ex. Affiche concert)" aria-label="Nom de la palette"><button class="btn solid" id="palSave">★ Enregistrer la palette</button><button class="btn" id="palCss">Copier en CSS</button></div>
+      <div class="poster-mini"><svg id="pm" viewBox="0 0 100 141"></svg><div><h4>Règle 60-30-10</h4><p style="font-size:15px">60 % pour la couleur dominante (le fond), 30 % pour la couleur d'appui (la forme), 10 % pour l'accent (ce qui doit attirer l'œil).</p></div></div>
+    </div>
+  </div>
+
+  <div class="sec rule"><div class="itten">
+    <div id="itten"></div>
+    <div>
+      <h3 style="margin-bottom:12px">Primaires, secondaires, tertiaires</h3>
+      <p><b>Primaires</b> (centre) : rouge, jaune, bleu. On ne peut pas les obtenir en mélangeant d'autres peintures.</p><div class="chips" id="cP"></div>
+      <p style="margin-top:12px"><b>Secondaires</b> (anneau du milieu) : deux primaires mélangées. Jaune + rouge = orange, rouge + bleu = violet, bleu + jaune = vert.</p><div class="chips" id="cS"></div>
+      <p style="margin-top:12px"><b>Tertiaires</b> (anneau extérieur, lettre T) : une primaire + la secondaire voisine. Leur nom commence par la primaire.</p><div class="chips" id="cT"></div>
+      <p style="margin-top:12px"><b>Complémentaires</b> : face à face sur le cercle (rouge / vert, jaune / violet, bleu / orange). <b>Chaudes</b> : du jaune au rouge-violet, elles avancent. <b>Froides</b> : du violet au jaune-vert, elles reculent.</p>
+      <p class="small">Le cercle du peintre (Johannes Itten, 1961) sert pour la peinture et l'analyse d'images. Le cercle RVB sert pour l'écran : le complémentaire du rouge y est le cyan.</p>
+    </div>
+  </div></div>
+
+  <div class="sec rule"><h3>Les 7 contrastes de couleur (Johannes Itten)</h3>
+  <div class="contr">
+    <div><div class="demo"><i style="background:#e3001b"></i><i style="background:#ffd400"></i><i style="background:#0057b8"></i></div><h4>1. Contraste de teinte</h4><p class="small">Des couleurs pures côte à côte. Effet franc, joyeux, Bauhaus.</p></div>
+    <div><div class="demo"><i style="background:#f5f5f5"></i><i style="background:#9a9a9a"></i><i style="background:#111"></i></div><h4>2. Clair-obscur</h4><p class="small">L'écart de valeur. C'est lui qui fait la lisibilité : testez votre affiche en noir et blanc.</p></div>
+    <div><div class="demo"><i style="background:#ff7a00"></i><i style="background:#00897b"></i></div><h4>3. Chaud-froid</h4><p class="small">Le chaud avance, le froid recule : de la profondeur sans perspective.</p></div>
+    <div><div class="demo"><i style="background:#0057b8"></i><i style="background:#ff7a00"></i></div><h4>4. Complémentaires</h4><p class="small">Deux opposés : vibration maximale. Pour un bouton, un prix, un titre.</p></div>
+    <div><div class="simul"><i style="background:#ff7a00"><b></b></i><i style="background:#0091a0"><b></b></i></div><h4>5. Contraste simultané</h4><p class="small">Les deux carrés gris sont identiques. L'œil les teinte de la complémentaire du fond.</p></div>
+    <div><div class="demo"><i style="background:#e3001b"></i><i style="background:#b8505a"></i><i style="background:#8f7a7c"></i></div><h4>6. Contraste de qualité</h4><p class="small">Pur contre rabattu. Une seule couleur pure parmi des tons rompus devient la star.</p></div>
+    <div><div class="demo"><i style="background:#ffd400;flex:1"></i><i style="background:#6a2c91;flex:3"></i></div><h4>7. Contraste de quantité</h4><p class="small">La proportion. Un peu de jaune équilibre beaucoup de violet, car le jaune est bien plus lumineux.</p></div>
+  </div></div>
+
+  <div class="sec rule"><h3>Vérificateur de contraste (WCAG)</h3>
+  <div class="cc">
+    <div class="panel">
+      <div class="grid2">
+        <div><label for="fgT">Texte</label><div class="pair"><input type="color" id="fgC" value="#ffffff" aria-label="Couleur du texte"><input type="text" id="fgT" value="#FFFFFF" maxlength="7"></div></div>
+        <div><label for="bgT">Fond</label><div class="pair"><input type="color" id="bgC" value="#1f3fd1" aria-label="Couleur du fond"><input type="text" id="bgT" value="#1F3FD1" maxlength="7"></div></div>
+      </div>
+      <p style="margin-top:14px"><button class="btn" id="swap">Inverser</button></p>
+      <div class="badges" id="badges"></div>
+      <p class="small" style="margin-top:12px">Minimum 4,5:1 pour le texte courant, 3:1 pour les gros titres (24 px, ou 19 px en gras) et les icônes.</p>
+    </div>
+    <div class="prev" id="ccPrev"><div class="big" id="ratio">–</div><p style="font-size:24px;font-weight:800;margin:0">Titre d'affiche</p><p style="margin:0">Texte courant : est-ce que je peux me lire facilement, longtemps, sur un téléphone en plein soleil ?</p></div>
+  </div></div>
+
+  <div class="sec rule"><h3>Écran ou papier ?</h3>
+  <div class="grid4">
+    <div><h4>RVB (RGB)</h4><p class="small">Lumière : rouge, vert, bleu s'additionnent jusqu'au blanc. Pour tout ce qui s'affiche sur un écran.</p></div>
+    <div><h4>CMJN (CMYK)</h4><p class="small">Encre : cyan, magenta, jaune, noir se soustraient. Pour l'impression. Les couleurs fluo d'écran n'y existent pas.</p></div>
+    <div><h4>Pantone</h4><p class="small">Encres de couleur prêtes à l'emploi (tons directs), numérotées. Pour garantir la couleur exacte d'un logo.</p></div>
+    <div><h4>HEX et HSL</h4><p class="small">Les codes du web. HEX (#1F3FD1) pour copier, HSL (teinte, saturation, luminosité) pour créer des variantes.</p></div>
+  </div></div>
+</div></section>
+
+<!-- ================= SYMBOLIQUE ================= -->
+<section class="tab band" id="t-symbolique" hidden><div class="wrap">
+  <div class="head"><div><h2>Symbolique : pourquoi du bleu ?</h2>
+  <p class="lead" style="margin-top:10px">Une couleur n'a pas de sens toute seule : c'est la culture qui lui en donne, comme le montre l'historien Michel Pastoureau. Avant de choisir, posez-vous ces quatre questions.</p></div></div>
+  <div class="why">
+    <div><b>1. Le sens</b><p class="small">Que veut dire cette couleur pour mon public, dans son pays, aujourd'hui ?</p></div>
+    <div><b>2. La nuance</b><p class="small">Bleu ciel, bleu électrique et bleu marine ne racontent pas la même chose.</p></div>
+    <div><b>3. Le secteur</b><p class="small">Je suis les codes du domaine pour rassurer, ou je les casse pour me démarquer.</p></div>
+    <div><b>4. La lisibilité</b><p class="small">Le texte reste-t-il lisible sur cette couleur, en petit, de loin ?</p></div>
+  </div>
+  <div class="panel" style="margin-bottom:28px"><p style="margin:0;font-size:17px"><b>Exemple.</b> Une affiche de mutuelle santé en bleu moyen : confiance, calme, sérieux, le code du secteur. La même affiche en bleu nuit avec un accent rose fluo : on bascule vers une soirée électro. Même teinte de départ, message opposé.</p></div>
+  <div class="sym" id="sym"></div>
+</div></section>
+
+<!-- ================= COMPOSITION ================= -->
+<section class="tab band" id="t-composition" hidden><div class="wrap">
+  <div class="head"><div><h2>Gabarits d'affiche</h2>
+  <p class="lead" style="margin-top:10px">Neuf structures que l'on retrouve dans les affiches célèbres. Affichez la grille et le sens de lecture pour comprendre pourquoi chaque élément est placé là.</p></div>
+  <div class="seg"><button class="btn" id="tgG" aria-pressed="true">Grille</button><button class="btn" id="tgR" aria-pressed="true">Sens de lecture</button></div></div>
+  <div class="gab show-grid show-read" id="gab"></div>
+  <div class="grid2 sec">
+    <div class="rule"><h3 style="margin-bottom:14px">Hiérarchie d'une affiche</h3>
+      <ol class="hier">
+        <li><div><b>L'accroche</b> : le titre ou le visuel fort. Lu en 1 seconde, de loin.</div></li>
+        <li><div><b>Le visuel</b> : image, forme ou typo qui porte l'émotion.</div></li>
+        <li><div><b>L'information</b> : quoi, où, quand, combien. Lisible à 2 mètres.</div></li>
+        <li><div><b>L'action</b> : billetterie, QR code, site, date limite.</div></li>
+        <li><div><b>Les signatures</b> : logos, partenaires, mentions. Groupés, en bas, petits.</div></li>
+      </ol>
+      <p class="small" style="margin-top:12px">Si tout est gros, rien n'est gros. Trois niveaux de taille suffisent souvent.</p>
+    </div>
+    <div class="rule"><h3 style="margin-bottom:14px">Check-list avant impression</h3>
+      <ul style="margin:0;padding-left:20px;display:grid;gap:6px">
+        <li>Fond perdu de 3 mm tout autour (5 mm en grand format).</li>
+        <li>Zone tranquille d'au moins 5 mm : rien d'important au bord.</li>
+        <li>Images à 300 dpi à la taille réelle (150 dpi suffisent souvent en très grand format vu de loin).</li>
+        <li>Mode CMJN avec le profil de l'imprimeur (souvent Coated FOGRA39 en Europe).</li>
+        <li>Noir riche pour les grands aplats, noir 100 % seul pour le petit texte.</li>
+        <li>Export en PDF/X, polices incorporées ou vectorisées. BAT relu et signé.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="sec rule"><h3>Formats courants</h3>
+  <div class="scroll"><table>
+    <thead><tr><th>Format</th><th>Taille</th><th>Usage</th></tr></thead>
+    <tbody>
+      <tr><td>A5</td><td class="n">14,8 × 21 cm</td><td>Flyer, carton d'invitation</td></tr>
+      <tr><td>A4</td><td class="n">21 × 29,7 cm</td><td>Flyer, affichette, document</td></tr>
+      <tr><td>A3</td><td class="n">29,7 × 42 cm</td><td>Affichette de vitrine, école, association</td></tr>
+      <tr><td>A2</td><td class="n">42 × 59,4 cm</td><td>Affiche d'intérieur, exposition</td></tr>
+      <tr><td>40 × 60</td><td class="n">40 × 60 cm</td><td>Affiche commerciale, cinéma (petit format)</td></tr>
+      <tr><td>Abribus / sucette</td><td class="n">120 × 176 cm</td><td>Mobilier urbain, rétroéclairé</td></tr>
+      <tr><td>4 × 3</td><td class="n">400 × 300 cm</td><td>Panneau routier, lu en 2 secondes</td></tr>
+    </tbody></table></div></div>
+</div></section>
+
+<!-- ================= LOGOS ================= -->
+<section class="tab band" id="t-logos" hidden><div class="wrap">
+  <div class="head"><div><h2>Logos : familles et construction</h2>
+  <p class="lead" style="margin-top:10px">Huit grandes familles de logos (dessinées ici avec des marques inventées), puis l'anatomie d'un logo : construction, zone de protection, déclinaisons.</p></div></div>
+  <div class="lt" id="lt"></div>
+  <div class="sec rule"><div class="cons">
+    <div class="show-c show-z show-m" id="consBox"></div>
+    <div>
+      <h3 style="margin-bottom:12px">Anatomie d'un logo</h3>
+      <div class="seg" style="margin-bottom:14px"><button class="btn sm" data-lg="c" aria-pressed="true">Construction</button><button class="btn sm" data-lg="z" aria-pressed="true">Zone de protection</button><button class="btn sm" data-lg="m" aria-pressed="true">Taille minimale</button></div>
+      <p><b>Grille de construction.</b> Les formes sont tracées à partir de cercles et d'axes communs : c'est ce qui donne l'impression d'équilibre.</p>
+      <p><b>Zone de protection.</b> Un espace vide autour du logo, mesuré avec un élément du logo lui-même (ici x = le rayon du cercle).</p>
+      <p><b>Taille minimale.</b> En dessous, le logo devient illisible : on fixe une largeur mini et on prévoit une version simplifiée.</p>
+    </div>
+  </div></div>
+  <div class="decl" id="decl"></div>
+  <div class="grid3 sec">
+    <div class="rule"><h4>Placer un logo sur une affiche</h4><p class="small">En bas à droite (fin de la lecture en Z) ou en haut à gauche pour une marque qui signe. Aligné sur la grille et les marges.</p></div>
+    <div class="rule"><h4>Les partenaires</h4><p class="small">Un bandeau en bas, logos à hauteur visuelle égale (pas largeur égale), en monochrome si les couleurs se battent.</p></div>
+    <div class="rule"><h4>Le test du logo</h4><p class="small">Reconnaissable en noir et blanc, en 16 px (favicon), brodé sur un t-shirt et de loin. Sinon, il est trop compliqué.</p></div>
+  </div>
+</div></section>
+
+<!-- ================= TYPO ================= -->
+<section class="tab band" id="t-typo" hidden><div class="wrap">
+  <div class="head"><div><h2>Typographie</h2>
+  <p class="lead" style="margin-top:10px">Anatomie de la lettre, familles, testeur de polices, associations, échelle typographique et règles françaises.</p></div>
+  <div><label for="anatF">Police analysée</label><select id="anatF" style="width:auto;display:block"><option>Playfair Display</option><option>Inter</option><option>Bodoni Moda</option><option>Jost</option><option>EB Garamond</option></select></div></div>
+  <div class="anat">
+    <div class="fig" id="anat"><svg aria-label="Anatomie de la lettre"></svg></div>
+    <ul class="legend">
+      <li><i style="border-color:#1f3fd1"></i><span><b>Ligne des ascendantes</b> : haut des hampes (d, h, l).</span></li>
+      <li><i style="border-color:#e4002b"></i><span><b>Hauteur de capitale</b> : haut du H.</span></li>
+      <li><i style="border-color:#ff6a13"></i><span><b>Hauteur d'x</b> : haut des minuscules. Grande = plus lisible en petit.</span></li>
+      <li><i style="border-color:currentColor"></i><span><b>Ligne de base</b> : la ligne sur laquelle tout repose.</span></li>
+      <li><i style="border-color:#8a8a8a;border-top-style:dashed"></i><span><b>Ligne des descendantes</b> : bas des jambages (p, g).</span></li>
+      <li class="small" style="margin-top:6px">Tout le vocabulaire (empattement, fût, panse, contrepoinçon…) est dans l'onglet Lexique.</li>
+    </ul>
+  </div>
+  <div class="sec rule"><h3>Les familles (classification Vox-ATypI simplifiée)</h3><div class="cls" id="cls"></div></div>
+  <div class="sec rule"><h3>Testeur de polices</h3>
+  <div class="tester">
+    <div class="ctrl">
+      <div><label for="tf">Police</label><select id="tf"></select></div>
+      <div class="row"><label for="tz">Taille</label><input type="range" id="tz" min="12" max="160" value="64"><output id="oz"></output></div>
+      <div><label for="tw">Graisse</label><select id="tw"></select></div>
+      <div class="row"><label for="tl">Interlignage</label><input type="range" id="tl" min="0.8" max="2" step="0.05" value="1.1"><output id="ol"></output></div>
+      <div class="row"><label for="tt">Approche</label><input type="range" id="tt" min="-0.08" max="0.3" step="0.01" value="0"><output id="ot"></output></div>
+      <div><label for="tc">Casse</label><select id="tc"><option value="none">Normale</option><option value="uppercase">MAJUSCULES</option><option value="lowercase">minuscules</option></select></div>
+      <div><label for="tx">Texte</label><textarea id="tx" rows="3">Le vif zéphyr jubile sur les kumquats du clown gracieux.</textarea></div>
+      <div class="seg"><span id="tFav"></span><a class="btn sm" id="tGF" href="https://fonts.google.com" target="_blank" rel="noopener">Google Fonts ↗</a><button class="btn sm" id="tCopy">Copier le CSS</button></div>
+    </div>
+    <div><div class="preview" id="tp"></div><pre><code id="tcss"></code></pre></div>
+  </div></div>
+  <div class="sec rule"><h3>Associations qui marchent</h3>
+  <p class="lead" style="margin:-4px 0 16px">Deux polices maximum, avec un vrai contraste : serif + sans, ou deux graisses très éloignées d'une même famille.</p>
+  <div class="pairs" id="pairs"></div></div>
+  <div class="sec rule"><h3>Échelle typographique</h3>
+  <div class="scale">
+    <div class="ctrl panel">
+      <div><label for="sb">Taille de base (px)</label><input type="number" id="sb" value="16" min="10" max="24"></div>
+      <div><label for="sr">Rapport</label><select id="sr">
+        <option value="1.125">1,125 · seconde majeure (interface dense)</option>
+        <option value="1.2">1,2 · tierce mineure (site, appli)</option>
+        <option value="1.25" selected>1,25 · tierce majeure (polyvalent)</option>
+        <option value="1.333">1,333 · quarte juste (éditorial)</option>
+        <option value="1.5">1,5 · quinte juste (portfolio)</option>
+        <option value="1.618">1,618 · nombre d'or (affiche)</option>
+      </select></div>
+      <p class="small" style="margin:0">Chaque niveau = le précédent × le rapport : des tailles cohérentes au lieu de tailles au hasard.</p>
+      <button class="btn" id="sCopy">Copier les variables CSS</button>
+    </div>
+    <div class="scale-out" id="so"></div>
+  </div></div>
+  <div class="rules sec">
+    <div class="rule"><h3 style="margin-bottom:12px">Règles de lisibilité</h3><ul>
+      <li>Texte courant : 16 px minimum à l'écran, 9 à 11 pt en print.</li>
+      <li>Interlignage : 1,4 à 1,6 pour le texte, 1 à 1,2 pour les titres.</li>
+      <li>Longueur de ligne : 45 à 75 caractères.</li>
+      <li>Fer à gauche sur le web. Le justifié sans césure crée des lézardes.</li>
+      <li>Jamais de faux gras, faux italique, ni de lettres étirées ou écrasées.</li>
+      <li>Les capitales ont besoin d'un peu d'approche en plus (+5 à +10 %).</li>
+      <li>Une police de titre (display) n'est pas faite pour du texte long.</li>
+    </ul></div>
+    <div class="rule"><h3 style="margin-bottom:12px">Typographie française</h3><ul>
+      <li>Espace insécable avant <b>; : ! ?</b> et à l'intérieur des guillemets <b>« »</b>.</li>
+      <li>Guillemets français <b>« … »</b>, pas "…".</li>
+      <li>Apostrophe typographique <b>’</b> plutôt que l'apostrophe droite.</li>
+      <li>Les majuscules prennent l'accent : <b>État, À bientôt, ÉCOLE</b>.</li>
+      <li>Points de suspension en un seul signe <b>…</b></li>
+      <li>Nombres : espace insécable pour les milliers (<b>12 500</b>), virgule décimale (<b>3,5</b>).</li>
+      <li>En HTML : <code>&amp;nbsp;</code> ou <code>&amp;#8239;</code> (espace fine) avant la ponctuation haute.</li>
+    </ul></div>
+  </div>
+</div></section>
+
+<!-- ================= LEXIQUE ================= -->
+<section class="tab band" id="t-lexique" hidden><div class="wrap">
+  <div class="head"><div><h2>Lexique du graphiste</h2><p class="lead" style="margin-top:10px"><span id="lexN"></span> mots du métier, de la couleur à l'impression, du web aux mouvements artistiques. Mettez en favori ceux à réviser, puis testez-vous.</p></div>
+  <button class="btn solid" id="quizBtn">S'entraîner (quiz)</button></div>
+  <div class="quiz" id="quiz" hidden></div>
+  <div class="tools"><input type="search" id="lq" placeholder="Chercher un mot ou une définition…" aria-label="Rechercher dans le lexique"><div class="seg" id="lf"></div></div>
+  <dl class="lexgrid" id="lex"></dl>
+</div></section>
+
+<!-- ================= OUTILS ================= -->
+<section class="tab band" id="t-outils" hidden><div class="wrap">
+  <div class="head"><div><h2>Outils du quotidien</h2><p class="lead" style="margin-top:10px">Les petits calculs et conversions qu'un graphiste fait tous les jours, au même endroit.</p></div></div>
+  <div class="toolgrid">
+    <div class="tool"><h3>Convertisseur de couleur <span id="cvFav"></span></h3>
+      <div class="pair"><input type="color" id="cvC" value="#e4002b" aria-label="Choisir une couleur"><input type="text" id="cvT" value="#E4002B" aria-label="Couleur en HEX, rgb() ou hsl()"></div>
+      <p class="small" style="margin:0">Collez un code HEX, <code>rgb(…)</code> ou <code>hsl(…)</code>. Cliquez une ligne pour la copier.</p>
+      <div id="cvOut"></div>
+      <div><b class="small">Teintes et ombres (clic = copier)</b><div class="steps" id="cvSteps" style="margin-top:6px"></div></div>
+    </div>
+    <div class="tool"><h3>Palette depuis une image</h3>
+      <label class="drop" id="drop"><input type="file" id="imgIn" accept="image/*" hidden><span id="dropTxt"><b>Déposez une image</b> ou cliquez pour en choisir une (photo, affiche, moodboard)</span></label>
+      <canvas id="imgCv" hidden></canvas>
+      <div class="swatches" id="imgSw"></div>
+      <div class="savebar" id="imgSave" hidden><input type="text" id="imgName" placeholder="Nom de la palette" aria-label="Nom de la palette extraite"><button class="btn solid" id="imgPalSave">★ Enregistrer</button></div>
+      <p class="small" style="margin:0">L'image reste sur votre appareil : rien n'est envoyé.</p>
+    </div>
+    <div class="tool"><h3>Calculateur d'impression</h3>
+      <div class="f3"><div><label for="pf">Format</label><select id="pf"></select></div><div><label for="pd">Résolution</label><select id="pd"><option>72</option><option>150</option><option selected>300</option></select></div><div><label for="pb">Fond perdu</label><select id="pb"><option value="0">Sans</option><option value="3" selected>3 mm</option><option value="5">5 mm</option></select></div></div>
+      <div class="f2" id="pCustom" hidden><div><label for="pw">Largeur (mm)</label><input type="number" id="pw" value="210"></div><div><label for="ph">Hauteur (mm)</label><input type="number" id="ph" value="297"></div></div>
+      <div class="result" id="pOut"></div><p class="small" id="pOut2" style="margin:0"></p>
+      <div class="rule" style="border-top-width:1px"><b>Dans l'autre sens</b> : mon image fait…</div>
+      <div class="f3"><div><label for="rw">Largeur (px)</label><input type="number" id="rw" value="4000"></div><div><label for="rh">Hauteur (px)</label><input type="number" id="rh" value="3000"></div><div><label for="rd">à (dpi)</label><input type="number" id="rd" value="300"></div></div>
+      <p id="rOut" style="margin:0;font-weight:700"></p>
+    </div>
+    <div class="tool"><h3>Convertisseur d'unités</h3>
+      <div class="f3"><div><label for="uv">Valeur</label><input type="number" id="uv" value="16" step="any"></div><div><label for="uu">Unité</label><select id="uu"><option>px</option><option>rem</option><option>pt</option><option>mm</option><option>cm</option><option>in</option></select></div><div><label for="ub">Base rem (px)</label><input type="number" id="ub" value="16"></div></div>
+      <div id="uOut"></div>
+      <p class="small" style="margin:0">Repères : 1 pouce = 96 px CSS = 72 pt = 25,4 mm.</p>
+    </div>
+    <div class="tool"><h3>Ratio et redimensionnement</h3>
+      <div class="f2"><div><label for="aw">Largeur</label><input type="number" id="aw" value="1920"></div><div><label for="ah">Hauteur</label><input type="number" id="ah" value="1080"></div></div>
+      <div class="seg" id="aPre"></div>
+      <div class="result" id="aOut"></div>
+      <div class="f2"><div><label for="anw">Nouvelle largeur</label><input type="number" id="anw" value="1080"></div><div><label>Nouvelle hauteur</label><div class="result" id="anh" style="font-size:24px;padding-top:6px"></div></div></div>
+    </div>
+    <div class="tool"><h3>Générateur de dégradé</h3>
+      <div class="gradprev" id="gPrev"></div>
+      <div class="f3"><div><label for="g1">Couleur 1</label><input type="color" id="g1" value="#1f3fd1"></div><div><label for="g2">Couleur 2</label><input type="color" id="g2" value="#ff6a13"></div><div><label for="g3on">Couleur 3</label><div class="pair"><input type="color" id="g3" value="#ffc400"><input type="checkbox" id="g3on" aria-label="Utiliser une 3e couleur"></div></div></div>
+      <div class="row"><label for="ga">Angle</label><input type="range" id="ga" min="0" max="360" value="135"><output id="oga"></output></div>
+      <div class="seg"><button class="btn sm" data-gt="linear" aria-pressed="true">Linéaire</button><button class="btn sm" data-gt="radial" aria-pressed="false">Radial</button><button class="btn sm" data-gt="conic" aria-pressed="false">Conique</button></div>
+      <pre><code id="gCss"></code></pre>
+      <div class="seg"><button class="btn sm" id="gCopy">Copier le CSS</button><button class="btn sm" id="gSave">★ Garder comme palette</button></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ================= RÉFÉRENCES ================= -->
+<section class="tab band" id="t-references" hidden><div class="wrap">
+  <div class="head"><div><h2>Références</h2><p class="lead" style="margin-top:10px">Les plateformes où regardent les graphistes et designers : projets, sites, identités, magazines, typos. Chaque fiche dit comment bien l'utiliser.</p></div></div>
+  <div class="refnav" id="refnav"></div>
+  <div id="refs"></div>
+  <div class="sec rule"><h3>Livres de référence</h3>
+  <div class="grid3" style="font-size:15px"><p>Josef Albers, <i>L'Interaction des couleurs</i> (1963)</p><p>Johannes Itten, <i>L'Art de la couleur</i> (1961)</p><p>Michel Pastoureau, <i>Bleu. Histoire d'une couleur</i> (2000)</p><p>Josef Müller-Brockmann, <i>Grid Systems in Graphic Design</i> (1981)</p><p>Ellen Lupton, <i>Thinking with Type</i> (2004)</p><p>Robert Bringhurst, <i>The Elements of Typographic Style</i> (1992)</p></div></div>
+  <div class="sec rule"><h3>À visiter sur la Côte d'Azur</h3>
+  <div class="grid3" style="font-size:15px"><p><b>MAMAC</b>, Nice : Nouveau Réalisme, Yves Klein, Niki de Saint Phalle.</p><p><b>Fondation Maeght</b>, Saint-Paul-de-Vence : art moderne et contemporain.</p><p><b>Cap Moderne</b>, Roquebrune-Cap-Martin : villa E-1027 d'Eileen Gray, Cabanon de Le Corbusier.</p></div></div>
+</div></section>
+
+<!-- ================= MON ESPACE ================= -->
+<section class="tab band" id="t-espace" hidden><div class="wrap">
+  <div id="espace"></div>
+</div></section>
+</main>
+
+<footer class="band"><div class="wrap" style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;align-items:center">
+  <a class="brand" href="#aujourdhui"><i><b></b><b></b><b></b><b></b></i>Atelier</a>
+  <p class="small" style="margin:0">Boîte à outils de culture visuelle. Images des œuvres : Wikimedia Commons, sous licences libres, auteurs crédités.</p>
+</div></footer>
+
+<!-- Modal artiste -->
+<dialog id="artModal" aria-label="Fiche artiste"><div class="dlg-head"><button class="btn sm" data-close>Fermer ✕</button></div><div class="dlg-body" id="artBody"></div></dialog>
+
+<!-- Modal compte -->
+<dialog id="authModal" aria-label="Compte"><div class="dlg-head"><button class="btn sm" data-close>✕</button></div><div class="dlg-body">
+  <h2 style="font-size:32px" id="authTitle">Mon compte</h2>
+  <div class="authtabs" id="authTabs"><button class="btn sm" data-am="in" aria-pressed="true">Connexion</button><button class="btn sm" data-am="up" aria-pressed="false">Inscription</button></div>
+  <form class="form" id="authForm" novalidate>
+    <div id="fPseudo" hidden><label for="aPseudo">Prénom ou pseudo</label><input type="text" id="aPseudo" autocomplete="nickname"></div>
+    <div id="fEmail"><label for="aEmail">Email</label><input type="email" id="aEmail" autocomplete="email" required></div>
+    <div id="fPass"><label for="aPass">Mot de passe <span class="small">(6 caractères minimum)</span></label><input type="password" id="aPass" autocomplete="current-password" minlength="6"></div>
+    <p class="err" id="aErr" role="alert"></p>
+    <button class="btn solid" type="submit" id="aSubmit">Se connecter</button>
+    <button class="btn" type="button" id="aForgot" style="border-color:transparent">Mot de passe oublié ?</button>
+  </form>
+  <p class="small" style="margin-top:14px">Vos favoris (artistes, palettes, couleurs, polices, mots, références) sont enregistrés sur votre compte et visibles uniquement par vous.</p>
+</div></dialog>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
