@@ -29,11 +29,11 @@
 <section class="tab band" id="t-aujourdhui"><div class="wrap">
   <div class="head">
     <div><h1>L'atelier du jour</h1>
-    <p class="lead" style="margin-top:10px">Chaque jour : un artiste du web, un graphiste, un artiste contemporain, un designer, un mot de vocabulaire et un exercice. Cliquez sur une fiche pour voir les œuvres.</p></div>
+    <p class="lead" style="margin-top:10px">Chaque jour : un artiste du web, un graphiste, un artiste contemporain et un designer, puis six autres créateurs pour varier les horizons, un mot de vocabulaire et un exercice. Cliquez sur une fiche pour voir les œuvres.</p></div>
     <div class="datebar"><button class="btn" id="prev" aria-label="Jour précédent">←</button><strong id="date">…</strong><button class="btn" id="next" aria-label="Jour suivant">→</button><button class="btn" id="today" hidden>Aujourd'hui</button></div>
   </div>
   <div class="plates" id="plates"></div>
-  <div class="sec"><h3 style="margin-bottom:14px">Et aussi aujourd'hui</h3><div class="agrid" id="also"></div></div>
+  <div class="sec"><h3 style="margin-bottom:14px">Et aussi aujourd'hui</h3><div class="also" id="also"></div></div>
   <div class="daily">
     <div class="word" id="word"></div>
     <div class="exo"><b>Exercice du jour</b><p id="exo" style="font-size:17px;margin:0"></p></div>
@@ -65,7 +65,7 @@
       <div class="row"><label for="hS">Saturation</label><input type="range" id="hS" min="0" max="100" value="80"><output id="oS"></output></div>
       <div class="row"><label for="hL">Luminosité</label><input type="range" id="hL" min="10" max="90" value="50"><output id="oL"></output></div>
       <div class="swatches" id="sw"></div>
-      <div class="savebar"><input type="text" id="palName" placeholder="Nom de la palette (ex. Affiche concert)" aria-label="Nom de la palette"><button class="btn solid" id="palSave">★ Enregistrer la palette</button><button class="btn" id="palCss">Copier en CSS</button></div>
+      <div class="savebar"><input type="text" id="palName" placeholder="Nom de la palette" aria-label="Nom de la palette"><button class="btn solid" id="palSave">★ Enregistrer la palette</button><button class="btn" id="palCss">Copier en CSS</button></div>
       <div class="poster-mini"><svg id="pm" viewBox="0 0 100 141"></svg><div><h4>Règle 60-30-10</h4><p style="font-size:15px">60 % pour la couleur dominante (le fond), 30 % pour la couleur d'appui (la forme), 10 % pour l'accent (ce qui doit attirer l'œil).</p></div></div>
     </div>
   </div>
@@ -107,7 +107,7 @@
     <div class="prev" id="ccPrev"><div class="big" id="ratio">–</div><p style="font-size:24px;font-weight:800;margin:0">Titre d'affiche</p><p style="margin:0">Texte courant : est-ce que je peux me lire facilement, longtemps, sur un téléphone en plein soleil ?</p></div>
   </div></div>
 
-  <div class="sec rule"><h3>Écran ou papier ?</h3>
+  <div class="sec rule"><h3>Écran ou papier ? <a class="btn sm" href="#symbolique" style="margin-left:8px;vertical-align:middle">Ce que disent les couleurs →</a></h3>
   <div class="grid4">
     <div><h4>RVB (RGB)</h4><p class="small">Lumière : rouge, vert, bleu s'additionnent jusqu'au blanc. Pour tout ce qui s'affiche sur un écran.</p></div>
     <div><h4>CMJN (CMYK)</h4><p class="small">Encre : cyan, magenta, jaune, noir se soustraient. Pour l'impression. Les couleurs fluo d'écran n'y existent pas.</p></div>
@@ -122,7 +122,7 @@
   <p class="lead" style="margin-top:10px">Rien n'est neutre dans une image : une couleur, une forme, un mot ou un nombre portent un sens que le public lit sans s'en rendre compte. Apprenez à le choisir.</p></div>
   <div class="seg" id="symTabs" role="tablist"><button class="btn" data-st="couleurs" aria-pressed="true">Couleurs</button><button class="btn" data-st="formes" aria-pressed="false">Formes</button><button class="btn" data-st="mots" aria-pressed="false">Mots</button><button class="btn" data-st="nombres" aria-pressed="false">Nombres</button></div></div>
   <div class="stp" id="st-couleurs">
-  <h3 style="margin-bottom:12px">Pourquoi du bleu ?</h3>
+  <h3 style="margin-bottom:12px">Pourquoi du bleu ? <a class="btn sm" href="#couleurs" style="margin-left:8px;vertical-align:middle">Composer une palette →</a></h3>
   <p class="lead" style="margin-bottom:16px">Une couleur n'a pas de sens toute seule : c'est la culture qui lui en donne, comme le montre l'historien Michel Pastoureau. Avant de choisir, posez-vous ces quatre questions.</p>
   <div class="why">
     <div><b>1. Le sens</b><p class="small">Que veut dire cette couleur pour mon public, dans son pays, aujourd'hui ?</p></div>
@@ -143,7 +143,7 @@
     <p class="lead" style="margin-bottom:20px">Les mots ne disent pas seulement ce qu'ils disent : ils évoquent, ils suggèrent, ils sonnent. Un graphiste choisit ses mots comme ses couleurs, et les met en forme pour renforcer leur sens.</p>
     <h3 style="margin-bottom:14px">Les bases de la sémiologie</h3><div class="grid4" id="semio"></div>
     <div class="sec rule"><h3 style="margin-bottom:14px">Les figures de style, en mots et en images</h3><p class="lead" style="margin:-6px 0 16px">La publicité et l'affiche utilisent les mêmes figures que la poésie, mais avec des images.</p><div class="figs" id="figs"></div></div>
-    <div class="sec rule"><h3 style="margin-bottom:14px">Univers, mots, typos et couleurs</h3><div class="scroll"><table class="stack"><thead><tr><th>Univers</th><th>Mots qui l'évoquent</th><th>Typographie</th><th>Couleurs</th></tr></thead><tbody id="univ"></tbody></table></div></div>
+    <div class="sec rule"><h3 style="margin-bottom:14px">Univers, mots, typos et couleurs</h3><div class="scroll"><table class="tstack"><thead><tr><th>Univers</th><th>Mots qui l'évoquent</th><th>Typographie</th><th>Couleurs</th></tr></thead><tbody id="univ"></tbody></table></div></div>
     <div class="sec rule grid2"><div><h3 style="margin-bottom:10px">Le poids des mots dans une interface</h3><ul style="margin:0;padding-left:20px;display:grid;gap:6px"><li>Un bouton commence par un verbe d'action : « Réserver ma place » plutôt que « Cliquez ici ».</li><li>Tutoyer rapproche, vouvoyer respecte : choisissez une fois pour toutes.</li><li>Un message d'erreur explique quoi faire, sans accuser : « Ce mot de passe est trop court » plutôt que « Erreur ».</li><li>Moins de mots, plus de sens : coupez tout ce qui ne sert pas.</li></ul></div><div><h3 style="margin-bottom:10px">Le mot devient image</h3><ul style="margin:0;padding-left:20px;display:grid;gap:6px"><li>Le choix de la police change le sens : « danger » en script élégante devient ironique.</li><li>La taille hiérarchise : le mot le plus gros est lu en premier, et retenu.</li><li>La position compte : un mot isolé dans le vide prend de la force.</li><li>Le calligramme dessine avec les mots (Apollinaire, 1918).</li></ul></div></div>
   </div>
   <div class="stp" id="st-nombres" hidden>
@@ -305,7 +305,7 @@
   <div class="toolgrid">
     <div class="tool"><h3>Convertisseur de couleur <span id="cvFav"></span></h3>
       <div class="pair"><input type="color" id="cvC" value="#e4002b" aria-label="Choisir une couleur"><input type="text" id="cvT" value="#E4002B" aria-label="Couleur en HEX, rgb() ou hsl()"></div>
-      <p class="small" style="margin:0">Collez un code HEX, <code>rgb(…)</code> ou <code>hsl(…)</code>. Cliquez une ligne pour la copier.</p>
+      <p class="small" style="margin:0">Collez un code HEX, <code>rgb(…)</code> ou <code>hsl(…)</code> : tous les formats s'affichent, prêts à copier.</p>
       <div id="cvOut"></div>
       <div><b class="small">Teintes et ombres (clic = copier)</b><div class="steps" id="cvSteps" style="margin-top:6px"></div></div>
     </div>
@@ -337,7 +337,7 @@
     </div>
     <div class="tool"><h3>Générateur de dégradé</h3>
       <div class="gradprev" id="gPrev"></div>
-      <div class="f3"><div><label for="g1">Couleur 1</label><input type="color" id="g1" value="#1f3fd1"></div><div><label for="g2">Couleur 2</label><input type="color" id="g2" value="#ff6a13"></div><div><label for="g3on">Couleur 3</label><div class="pair"><input type="color" id="g3" value="#ffc400"><input type="checkbox" id="g3on" aria-label="Utiliser une 3e couleur"></div></div></div>
+      <div class="f3"><div><label for="g1">Couleur 1</label><input type="color" id="g1" value="#1f3fd1"></div><div><label for="g2">Couleur 2</label><input type="color" id="g2" value="#ff6a13"></div><div><label for="g3on" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="g3on" style="width:18px;height:18px;margin:0">Couleur 3</label><input type="color" id="g3" value="#ffc400" aria-label="Couleur 3"></div></div>
       <div class="row"><label for="ga">Angle</label><input type="range" id="ga" min="0" max="360" value="135"><output id="oga"></output></div>
       <div class="seg"><button class="btn sm" data-gt="linear" aria-pressed="true">Linéaire</button><button class="btn sm" data-gt="radial" aria-pressed="false">Radial</button><button class="btn sm" data-gt="conic" aria-pressed="false">Conique</button></div>
       <pre><code id="gCss"></code></pre>

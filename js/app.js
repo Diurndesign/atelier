@@ -219,11 +219,12 @@ let curPal=[];
 function drawWheel(){const rot=C.mode==='ryb'?120:60;let s='';
   for(let i=0;i<36;i++){const a=i*10,sa=a-rot;s+=`<path class="sg" data-a="${a}" d="${sector(120,190,sa-5,sa+5.2)}" fill="${hsl2hex(hueOf(a),85,52)}"><title>${nameOf(a)}</title></path><path class="sg" data-a="${a}" d="${sector(82,118,sa-5,sa+5.2)}" fill="${hsl2hex(hueOf(a),C.s,C.l)}"/>`}
   const p=palette(),pts=p.map(c=>P(100,c.a-rot));curPal=p;
-  s+=`<circle cx="200" cy="200" r="78" fill="var(--bg)"/>`;
-  if(pts.length>2)s+=`<polygon points="${pts.map(q=>q.map(v=>v.toFixed(1)).join(',')).join(' ')}" fill="none" stroke="currentColor" stroke-width="2"/>`;
-  else if(pts.length===2)s+=`<line x1="${pts[0][0]}" y1="${pts[0][1]}" x2="${pts[1][0]}" y2="${pts[1][1]}" stroke="currentColor" stroke-width="2"/>`;
+  s+=`<circle cx="200" cy="200" r="80" fill="var(--bg)"/>`;
+  if(pts.length>2)s+=`<polygon points="${pts.map(q=>q.map(v=>v.toFixed(1)).join(',')).join(' ')}" fill="${p[0].hex}" fill-opacity=".12" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>`;
+  else if(pts.length===2)s+=`<line x1="${pts[0][0]}" y1="${pts[0][1]}" x2="${pts[1][0]}" y2="${pts[1][1]}" stroke="currentColor" stroke-width="2.5" stroke-dasharray="6 5"/>`;
+  pts.forEach((q,i)=>{if(C.h!=='mono'||i===2)s+=`<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="5" fill="currentColor"/>`});
   const seen=new Set();p.forEach((c,i)=>{const [x,y]=P(155,c.a-rot),key=Math.round(x)+'/'+Math.round(y);if(seen.has(key))return;seen.add(key);const big=i===0||C.h==='mono';s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${big?17:13}" fill="${C.h==='mono'?p[2].hex:c.hex}" stroke="#fff" stroke-width="4"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${big?19.5:15.5}" fill="none" stroke="#111" stroke-width="1.5"/>`});
-  s+=`<text x="200" y="196" text-anchor="middle" font-size="15" font-weight="800" fill="currentColor">${HARM[C.h][0]}</text><text x="200" y="216" text-anchor="middle" font-size="13" fill="currentColor" opacity=".7">${C.mode==='ryb'?'cercle du peintre':'cercle écran'}</text>`;
+
   $('#wheel').innerHTML=`<svg viewBox="0 0 400 400" role="img" aria-label="Cercle chromatique interactif" style="color:var(--ink)">${s}</svg>`;
   $('#sw').innerHTML=p.map(c=>`<button class="sw" data-copy="${c.hex}" data-copy-label="${c.hex} copié"><i style="background:${c.hex}"></i><span><b>${c.hex}</b>${c.n}</span></button>`).join('');
   $('#hnote').textContent=HARM[C.h][2];$('#oA').textContent=Math.round(C.a)+'°';$('#oS').textContent=C.s+'%';$('#oL').textContent=C.l+'%';
@@ -260,7 +261,7 @@ function renderSym2(){
   $('#semio').innerHTML=SEMIO.map(s=>`<div class="rule" style="border-top-width:2px"><h4>${s[0]}</h4><p style="font-size:15px">${s[1]}</p><p class="small" style="margin:0"><b>Exemple : </b>${s[2]}</p></div>`).join('');
   $('#figs').innerHTML=FIGURES.map(f=>`<div class="fig2"><h4 style="display:flex;justify-content:space-between;gap:8px;align-items:center">${f[0]} ${favBtn('term','Figure : '+f[0],'Figure de style : '+f[0],{},true)}</h4><p>${f[1]}</p><p><b>En mots : </b>${f[2]}</p><p class="small"><b>En image : </b>${f[3]}</p></div>`).join('');
   $('#univ').innerHTML=UNIVERS.map(u=>`<tr><td data-l="Univers"><b>${u[0]}</b></td><td data-l="Mots">${u[1]}</td><td data-l="Typo">${u[2]}</td><td data-l="Couleurs">${u[3]}</td></tr>`).join('');
-  $('#nums').innerHTML=NOMBRES.map(n=>`<div class="num"><b class="n">${n[0]}</b><h4>${n[1]} ${favBtn('term','Nombre : '+n[0],'Nombre : '+n[0]+' ('+n[1]+')',{},true)}</h4><p>${n[2]}</p>${n[3]!=='—'?`<p class="small"><b>Ailleurs : </b>${n[3]}</p>`:''}${n[4]!=='—'?`<p class="small"><b>En design : </b>${n[4]}</p>`:''}</div>`).join('')}
+  $('#nums').innerHTML=NOMBRES.map(n=>`<div class="num"><div class="top2"><b class="n">${n[0]}</b>${favBtn('term','Nombre : '+n[0],'Nombre : '+n[0]+' ('+n[1]+')',{},true)}</div><h4>${n[1]}</h4><p>${n[2]}</p>${n[3]!=='—'?`<p class="small"><b>Ailleurs : </b>${n[3]}</p>`:''}${n[4]!=='—'?`<p class="small"><b>En design : </b>${n[4]}</p>`:''}</div>`).join('')}
 onShow.symbolique=()=>{renderSym();renderSym2()};
 
 /* ---------- composition ---------- */
@@ -404,7 +405,9 @@ function grad(){const cols=[$('#g1').value,$('#g2').value];if($('#g3on').checked
 $$('[data-gt]').forEach(b=>b.onclick=()=>{gt=b.dataset.gt;$$('[data-gt]').forEach(x=>x.setAttribute('aria-pressed',x===b));grad()});
 $('#gCopy').onclick=()=>copy($('#gCss').textContent,'CSS copié');
 $('#gSave').onclick=()=>{const cols=[$('#g1').value,$('#g2').value];if($('#g3on').checked)cols.splice(1,0,$('#g3').value);const up=cols.map(x=>x.toUpperCase());addFav('palette',up.join('-'),'Dégradé '+up.join(' → '),{colors:up,name:'Dégradé',css:$('#gCss').textContent})};
-let toolsInit=false;onShow.outils=()=>{if(toolsInit)return;toolsInit=true;conv();printCalc();units();ratioCalc();grad()};
+function sampleImg(){const cv=document.createElement('canvas');cv.width=300;cv.height=200;const x=cv.getContext('2d');x.fillStyle='#1f3fd1';x.fillRect(0,0,300,200);x.fillStyle='#ffc400';x.beginPath();x.arc(200,90,62,0,7);x.fill();x.fillStyle='#e4002b';x.fillRect(0,120,170,80);x.fillStyle='#f2f0eb';x.fillRect(24,24,110,22);x.fillStyle='#111';x.fillRect(24,56,70,12);
+  const url=cv.toDataURL(),img=new Image();img.onload=()=>{$('#dropTxt').innerHTML=`<img src="${url}" alt="Image d'exemple"><span class="small">Exemple. Cliquez ou déposez votre propre image.</span>`;extract(img);$('#imgName').value='Palette exemple'};img.src=url}
+let toolsInit=false;onShow.outils=()=>{if(toolsInit)return;toolsInit=true;conv();printCalc();units();ratioCalc();grad();sampleImg()};
 
 /* ---------- références ---------- */
 $('#refnav').innerHTML=RES.map((g,i)=>`<a class="btn sm" href="#references" data-ref="${i}">${g[0]}</a>`).join('');
@@ -421,7 +424,7 @@ onShow.code=()=>{
   $('#learn').innerHTML=LEARN.map(l=>refCard([l[0],l[1],l[2],''])).join('')};
 
 /* ---------- mon espace ---------- */
-const KINDS=[['artist','Artistes'],['palette','Palettes'],['color','Couleurs'],['font','Polices'],['pair','Associations de polices'],['term','Mots à réviser'],['gabarit','Gabarits d’affiche'],['logo','Familles de logos'],['resource','Références']];
+const KINDS=[['artist','Artistes'],['palette','Palettes'],['color','Couleurs'],['font','Polices'],['pair','Associations de polices'],['term','Vocabulaire et symboles'],['gabarit','Gabarits d’affiche'],['logo','Familles de logos'],['resource','Références']];
 function renderEspace(){const rows=[...favs.values()];rows.forEach(r=>REG.set(fid(r.kind,r.key),r));
   let h=user?`<div class="hero-acct"><div><span class="eyebrow" style="color:#bbb">Mon espace</span><h1 style="margin-top:6px">Bonjour ${esc(pseudo())}</h1><p style="margin:8px 0 0;color:#ccc">${esc(user.email)} · ${rows.length} favori${rows.length>1?'s':''} synchronisé${rows.length>1?'s':''} sur tous vos appareils.</p></div><div class="seg"><button class="btn" id="logout">Se déconnecter</button></div></div>`
   :`<div class="hero-acct"><div><h1>Mon espace</h1><p style="margin:8px 0 0;color:#ccc">Créez un compte gratuit pour garder vos artistes, palettes, polices et mots préférés, et les retrouver sur tous vos appareils, même après la formation.${rows.length?(rows.length>1?` Les ${rows.length} favoris de cet appareil seront ajoutés à votre compte.`:' Le favori de cet appareil sera ajouté à votre compte.'):''}</p></div><div class="seg"><button class="btn" data-open-auth="up">Créer un compte</button><button class="btn" data-open-auth="in">Se connecter</button></div></div>`;
