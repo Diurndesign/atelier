@@ -88,5 +88,5 @@ const FREEALT={ps:[["PhotoCraft (ArtCraft)","alpha"],["GIMP",""],["Krita",""]],a
 /* nouveaux mots */
 LEX.push(["Double diamant","Web & UI","Modèle de conception en 4 phases : découvrir, définir, développer, livrer. Deux fois on ouvre les pistes, deux fois on les resserre."],
 ["Tri de cartes","Web & UI","Exercice où des utilisateurs rangent des contenus en groupes : il aide à construire l'arborescence d'un site."],
-["UX writing","Web & UI","L'écriture des textes d'interface : boutons, messages d'erreur, aides. Court, clair, utile."],["Handoff","UI","La passation des maquettes aux développeurs, avec les mesures, les styles et les états de chaque composant."]);
+["UX writing","Web & UI","L'écriture des textes d'interface : boutons, messages d'erreur, aides. Court, clair, utile."],["Handoff","Web & UI","La passation des maquettes aux développeurs, avec les mesures, les styles et les états de chaque composant."]);
 ALT.unshift(["Toute la suite Adobe","ArtCraft","https://getartcraft.com/apps","Gratuit et open source, encore en alpha : pour s'entraîner."]);
