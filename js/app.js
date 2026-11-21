@@ -29,10 +29,10 @@ function loadFont(n){if(!n||loaded.has(n))return;loaded.add(n);const l=document.
 let user=null,favs=new Map(),nudged=false,current='aujourdhui';
 const GROUPS=[["accueil","Aujourd'hui",[["aujourdhui","Aujourd'hui"]]],
  ["culture","Culture",[["artistes","Artistes"],["symbolique","Symbolique"],["lexique","Lexique"]]],
- ["bases","Bases du design",[["couleurs","Couleurs"],["typo","Typographie"],["composition","Composition"],["logos","Logos"]]],
+ ["bases","Bases du design",[["couleurs","Couleurs"],["typo","Typographie"],["composition","Composition"],["logos","Logos"],["print","Impression"]]],
  ["uxui","UI / UX & web",[["uxui","UI / UX"],["code","Code & jeux"]]],
  ["logiciels","Logiciels",[["logiciels","Logiciels"]]],
- ["metier","Métier",[["methode","Méthode de projet"],["certifs","Certifications"],["references","Ressources"],["outils","Outils"]]],
+ ["metier","Métier",[["methode","Méthode de projet"],["ia","IA & droit d'auteur"],["certifs","Certifications"],["references","Ressources"],["outils","Outils"]]],
  ["espace","Mon espace",[["espace","Mon espace"]]]];
 const GOF={};GROUPS.forEach(g=>g[2].forEach(t=>GOF[t[0]]=g));
 $('#groups').innerHTML=GROUPS.map(g=>`<a href="#${g[2][0][0]}" data-g="${g[0]}">${g[1]}${g[0]==='espace'?' <span class="count" id="favCount">0</span>':''}</a>`).join('');
@@ -111,7 +111,7 @@ document.addEventListener('click',e=>{
 $$('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d)d.close()}));
 
 /* ---------- router ---------- */
-const TABS=['aujourdhui','artistes','couleurs','symbolique','composition','logos','typo','methode','logiciels','uxui','certifs','lexique','outils','code','references','espace'];
+const TABS=['aujourdhui','artistes','couleurs','symbolique','composition','logos','typo','methode','logiciels','uxui','certifs','print','ia','lexique','outils','code','references','espace'];
 const onShow={};
 function route(){let t=location.hash.slice(1);if(!TABS.includes(t))t='aujourdhui';current=t;const g=GOF[t];
   $$('.tab').forEach(s=>s.hidden=s.id!=='t-'+t);
@@ -686,8 +686,116 @@ $('#cFilter').addEventListener('click',e=>{const b=e.target.closest('[data-cd]')
 $('#artcraft').innerHTML=`<div class="acx"><div><span class="eyebrow" style="color:#0a6b2f">Gratuit · open source</span><h3 style="margin:4px 0 8px">ArtCraft, la suite gratuite inspirée d'Adobe</h3><p style="margin:0 0 8px">Une suite indépendante (ce n'est pas Adobe), gratuite et open source, pour Windows, macOS, Linux et le navigateur, dont les interfaces reprennent celles de Photoshop, Illustrator, InDesign, Premiere… Parfait pour s'entraîner chez soi sans abonnement.</p><p class="small" style="margin:0"><b>Attention :</b> toutes les applis sont encore en alpha ou en développement. Pour un projet client, gardez un logiciel éprouvé et faites des sauvegardes.</p></div><div><ul class="acl">${ARTCRAFT.map(a=>`<li><b>${a[0]}</b><span>comme ${a[1]}</span><i class="${a[2]==='alpha'?'a':''}">${a[2]}</i></li>`).join('')}</ul><a class="btn sm solid" href="https://getartcraft.com/apps" target="_blank" rel="noopener" style="margin-top:10px">Découvrir ArtCraft ↗</a></div></div>`;
 
 /* ---------- accueil : accès rapides ---------- */
-const QUICK=[["artistes","Culture",BYID.size+" artistes, la symbolique et le lexique","var(--red)","layers",0],["couleurs","Bases du design","Couleurs, typographie, composition, logos","var(--yel)","swatch",0],["uxui","UI / UX","La démarche, les interfaces, l'accessibilité","var(--blue)","wire",1],["logiciels","Logiciels","Photoshop, Illustrator, InDesign, Figma…","var(--ora)","bezier",1],["certifs","Certifications","Design, web, back-end, IA, cybersécurité","#0a6b2f","dsys",1],["references","Ressources","Les meilleurs sites du métier, triés","#6a2c91","frames",0]];
+const QUICK=[["artistes","Culture",BYID.size+" artistes, la symbolique et le lexique","var(--red)","layers",0],["couleurs","Bases du design","Couleurs, typo, composition, logos, impression","var(--yel)","swatch",0],["uxui","UI / UX","La démarche, les interfaces, l'accessibilité","var(--blue)","wire",1],["logiciels","Logiciels","Photoshop, Illustrator, InDesign, Figma…","var(--ora)","bezier",1],["certifs","Certifications","Design, web, back-end, IA, cybersécurité","#0a6b2f","dsys",1],["ia","IA & droit d'auteur","Prompts, outils, licences, ce qu'on peut livrer","#6a2c91","frames",1]];
 $('#quick').innerHTML=`<h3 class="qh">Tout l'atelier</h3><div class="qgrid">${QUICK.map(q=>`<a class="qcard" href="#${q[0]}" style="--c:${q[3]}"><span class="qi">${ill(q[4])}</span><span class="qt"><b>${q[1]}${q[5]?' <em>Nouveau</em>':''}</b><span>${q[2]}</span></span></a>`).join('')}</div>`;
+
+
+/* ---------- illustrations impression ---------- */
+const bleedSvg=()=>{const g=sid();return `<svg viewBox="0 0 320 230" role="img" aria-label="Fond perdu, format fini et zone de sécurité" style="color:var(--ink)"><defs><clipPath id="${g}c"><rect x="40" y="25" width="240" height="180"/></clipPath></defs><rect x="40" y="25" width="240" height="180" fill="${RED}" opacity=".18"/><g clip-path="url(#${g}c)">${photo(40,25,240,120,g)}<rect x="40" y="145" width="240" height="60" fill="${YEL}"/></g><rect x="40" y="25" width="240" height="180" fill="none" stroke="${RED}" stroke-width="1.5" stroke-dasharray="5 3"/><rect x="52" y="37" width="216" height="156" fill="none" stroke="${INK}" stroke-width="2.2"/><rect x="66" y="51" width="188" height="128" fill="none" stroke="${BLU}" stroke-width="1.6" stroke-dasharray="4 3"/><text x="160" y="172" text-anchor="middle" font-size="16" font-weight="900" fill="#111" font-family="Archivo,sans-serif">FESTIVAL</text>${[[52,37,-1,-1],[268,37,1,-1],[52,193,-1,1],[268,193,1,1]].map(([x,y,dx,dy])=>`<path d="M${x} ${y+dy*6}V${y+dy*20}M${x+dx*6} ${y}H${x+dx*20}" stroke="${INK}" stroke-width="1"/>`).join('')}<text x="40" y="18" font-size="10" font-weight="800" fill="${RED}" font-family="Archivo,sans-serif">fond perdu 3 mm</text><text x="280" y="222" text-anchor="end" font-size="10" font-weight="800" fill="${INK}" font-family="Archivo,sans-serif">format fini</text><text x="70" y="64" font-size="10" font-weight="800" fill="${BLU}" font-family="Archivo,sans-serif">zone de sécurité</text></svg>`};
+Object.assign(ILL,{
+pellic:()=>{const g=sid();return `<defs><linearGradient id="${g}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".45" stop-color="#fff" stop-opacity=".7"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/></linearGradient></defs><rect x="30" y="14" width="100" height="72" rx="4" fill="${BLU}"/><rect x="30" y="14" width="100" height="72" rx="4" fill="url(#${g})"/><path d="M130 62L130 86H106Z" fill="#dfe6ff"/><path d="M130 62L106 86L112 66Z" fill="#fff" stroke="${LN}"/>`+T(40,34,'Film protecteur',`fill="#fff"`)},
+vernis:()=>`<rect x="30" y="14" width="100" height="72" rx="4" fill="#1a1a1a"/><circle cx="80" cy="46" r="20" fill="${RED}"/><path d="M66 34a20 20 0 0 1 22-6" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".85"/><path d="M93 58a20 20 0 0 1-8 7" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".6"/>`+T(36,80,'mat',`fill="#aaa"`)+T(104,80,'brillant',`fill="#fff"`),
+dorure:()=>{const g=sid();return `<defs><linearGradient id="${g}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8a6a1f"/><stop offset=".35" stop-color="#f6e27a"/><stop offset=".55" stop-color="#c79a2b"/><stop offset="1" stop-color="#fff1a8"/></linearGradient></defs><rect x="30" y="14" width="100" height="72" rx="4" fill="#1d2a52"/><text x="80" y="58" text-anchor="middle" font-size="26" font-weight="900" fill="url(#${g})" font-family="Georgia,serif">Or</text>`},
+gaufr:()=>`<rect x="30" y="14" width="100" height="72" rx="4" fill="#f4efe6" stroke="${LN}"/><circle cx="80" cy="50" r="22" fill="#f4efe6"/><path d="M62 37a22 22 0 0 1 32-6" stroke="#fff" stroke-width="4" fill="none"/><path d="M98 62a22 22 0 0 1-30 8" stroke="#bfb6a6" stroke-width="4" fill="none"/><text x="80" y="56" text-anchor="middle" font-size="16" font-weight="900" fill="#d8cfbf" font-family="Georgia,serif">A</text>`,
+decoupe:()=>`<rect x="30" y="14" width="100" height="72" rx="14" fill="${YEL}"/><rect x="30" y="14" width="100" height="72" rx="14" fill="none" stroke="${RED}" stroke-dasharray="4 3" stroke-width="1.4"/><circle cx="80" cy="50" r="16" fill="var(--panel)" stroke="${RED}" stroke-dasharray="4 3" stroke-width="1.4"/>`+T(36,94,'forme, fenêtre, coins arrondis'),
+pli:()=>`<path d="M30 30L80 20L80 82L30 92Z" fill="#fff" stroke="${INK}"/><path d="M80 20L130 30L130 92L80 82Z" fill="#e9e9e9" stroke="${INK}"/><line x1="80" y1="20" x2="80" y2="82" stroke="${RED}" stroke-width="2" stroke-dasharray="3 2"/>`+T(86,16,'rainage',`fill="${RED}"`)
+});
+const pliSvg=k=>{const P={simple:'M20 60L80 30L140 60',roule:'M20 70L130 70L130 40L40 40L40 55L115 55',accord:'M20 70L60 40L100 70L140 40',fenetre:'M20 40L20 70L140 70L140 40'}[k];return `<svg viewBox="0 0 160 90" aria-hidden="true" style="color:var(--ink)"><path d="${P}" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/></svg>`};
+
+/* ---------- onglet Impression ---------- */
+let prInit=false;
+onShow.print=()=>{if(prInit)return;prInit=true;
+  $('#bleedFig').innerHTML=bleedSvg();
+  $('#prFile').innerHTML=PR_FILE.map((x,i)=>`<div class="rcard"><h4><span class="stepn">${i+1}</span>${x[0]}</h4><p>${x[1]}</p><p class="dont">${x[2]}</p></div>`).join('');
+  $('#gram').innerHTML=PAPIERS.map(p=>`<div class="g"><b>${p[0]} g</b><span class="sheet" style="--h:${Math.max(2,Math.round(p[0]/350*22))}px"></span><span>${p[1]}</span></div>`).join('');
+  $('#papTypes').innerHTML=PAPIER_TYPES.map(p=>`<div class="fig2"><h4>${p[0]}</h4><p>${p[1]}</p><p class="small">${p[2]}</p></div>`).join('');
+  $('#finitions').innerHTML=FINITIONS.map(f=>`<div class="concept"><div class="ill">${ill(f[2])}</div><h4>${f[0]}</h4><p>${f[1]}</p></div>`).join('');
+  $('#plis').innerHTML=PLIS.map(p=>`<div class="pl">${pliSvg(p[2])}<b>${p[0]}</b><span class="small">${p[1]}</span></div>`).join('');
+  $('#reliures').innerHTML=RELIURES.map(r=>`<div class="fig2"><h4>${r[0]}</h4><p>${r[1]}</p></div>`).join('');
+  $('#batList').innerHTML=`<fieldset><legend>Avant de signer le BAT</legend>${BAT.map(b=>`<label><input type="checkbox"><span>${b}</span></label>`).join('')}</fieldset>`;
+  $('#offset').innerHTML=OFFSET.map(o=>`<div class="cd"><h4>${o[0]}</h4><p>${o[1]}</p><p class="small" style="margin:0">${o[2]}</p></div>`).join('');
+  $('#devisTxt').textContent=DEVIS_PRINT};
+$('#prTabs').addEventListener('click',e=>{const b=e.target.closest('[data-pr]');if(!b)return;$$('#prTabs .btn').forEach(x=>x.setAttribute('aria-pressed',x===b));$$('.prp').forEach(p=>p.hidden=p.id!=='pr-'+b.dataset.pr)});
+$('#devisCopy').onclick=()=>copy(DEVIS_PRINT,'Modèle de devis copié');
+
+/* ---------- onglet IA & droit ---------- */
+let iaInit=false;
+const pbVal=()=>PROMPT_IMG.map((p,i)=>[p[0],($('#pb'+i)||{}).value||'']);
+function pbBuild(){const v=pbVal(),main=v.slice(0,6).map(x=>x[1].trim()).filter(Boolean).join(', '),av=v[6][1].trim();$('#pbOut').value=main+(av?(main?'. ':'')+'À éviter : '+av:'')}
+onShow.ia=()=>{if(iaInit)return;iaInit=true;
+  $('#iaUses').innerHTML=IA_USES.map(r=>`<tr><td data-l="Étape"><b>${r[0]}</b></td><td data-l="L'IA fait bien">${r[1]}</td><td data-l="À vous">${r[2]}</td></tr>`).join('');
+  $('#iaNot').innerHTML=IA_NOT.map(x=>`<li>${x}</li>`).join('');
+  $('#iaTools').innerHTML=IA_TOOLS.map(t=>`<article class="cert" style="--c:#c2410c"><span class="eyebrow">${t[1]}</span><h4>${t[0]}</h4><p>${t[2]}</p><p class="tip">${t[3]}</p><div class="acts"><a class="btn sm solid" href="${t[4]}" target="_blank" rel="noopener">Ouvrir ↗</a>${favBtn('resource',t[4],t[0],{name:t[0],url:t[4],desc:t[2]},true)}</div></article>`).join('');
+  $('#pbForm').innerHTML=PROMPT_IMG.map((p,i)=>`<label for="pb${i}"><span>${p[0]}</span><small>${p[1]}</small></label><input type="text" id="pb${i}" placeholder="${esc(p[2])}">`).join('');
+  $('#pbRules').innerHTML=PROMPT_RULES.map(x=>`<li>${x}</li>`).join('');
+  $('#pTxt').innerHTML=PROMPT_TXT.map(x=>`<li>${x}</li>`).join('');
+  $('#iaLivrer').innerHTML=IA_LIVRER.map((x,i)=>`<div class="num"><div class="top2"><b class="n">${i+1}</b></div><h4>${x[0]}</h4><p>${x[1]}</p></div>`).join('');
+  $('#droit').innerHTML=DROIT.map(x=>`<div class="fig2"><h4>${x[0]}</h4><p>${x[1]}</p></div>`).join('');
+  $('#licFonts').innerHTML=LIC_FONTS.map(x=>`<div class="rcard"><h4>${x[0]}</h4><p class="do">${x[1]}</p><p class="dont">${x[2]}</p></div>`).join('');
+  $('#licCC').innerHTML=LIC_CC.map(x=>`<div class="cc" style="--c:${x[2]}"><b>${x[0]}</b><span>${x[1]}</span></div>`).join('');
+  $('#licImg').innerHTML=LIC_IMG.map(x=>`<div class="rcard"><h4>${x[0]}</h4><p>${x[1]}</p><p class="do">${x[2]}</p></div>`).join('');
+  pbBuild()};
+$('#iaTabs').addEventListener('click',e=>{const b=e.target.closest('[data-ia]');if(!b)return;$$('#iaTabs .btn').forEach(x=>x.setAttribute('aria-pressed',x===b));$$('.iap').forEach(p=>p.hidden=p.id!=='ia-'+b.dataset.ia)});
+$('#pbForm').addEventListener('input',pbBuild);
+$('#pbEx').onclick=()=>{PROMPT_IMG.forEach((p,i)=>$('#pb'+i).value=p[2]);pbBuild()};
+$('#pbClear').onclick=()=>{PROMPT_IMG.forEach((p,i)=>$('#pb'+i).value='');pbBuild()};
+$('#pbCopy').onclick=()=>{const v=$('#pbOut').value.trim();if(!v){toast('Remplissez au moins une case');return}copy(v,'Prompt copié')};
+
+/* ---------- recherche globale ---------- */
+let SIDX=null,sSel=0,sHits=[];
+function go(tab,fn){$('#searchDlg').close();if(location.hash.slice(1)!==tab)location.hash=tab;else route();if(fn)setTimeout(fn,80)}
+const sub=(sel)=>()=>{const b=$(sel);if(b)b.click()};
+function buildIdx(){const I=[];const add=(t,s,k,f,x='')=>I.push({t,s,k,f,n:norm(t),m:norm(s+' '+x)});
+  GROUPS.forEach(g=>g[2].forEach(x=>add(x[1],'Rubrique '+g[1],'Rubrique',()=>go(x[0]))));
+  ALL.forEach(x=>add(x.a[0],x.c.n+' · '+x.a[1]+' · '+x.a[2]+' · '+x.a[3],'Artiste',()=>{$('#searchDlg').close();openArtist(x.id)},x.a[5]));
+  LEX.forEach(t=>add(t[0],t[2],'Lexique',()=>go('lexique',()=>{$('#lq').value=t[0];renderLex()})));
+  SYM.forEach(c=>add(c[0],'Symbolique des couleurs · '+c[3],'Couleur',()=>go('symbolique',sub('[data-st="couleurs"]'))));
+  FORMES.forEach(f=>add(f[0],'Symbolique des formes · '+f[2],'Forme',()=>go('symbolique',sub('[data-st="formes"]'))));
+  NOMBRES.forEach(n=>add(n[0]+' · '+n[1],'Symbolique des nombres · '+n[2],'Nombre',()=>go('symbolique',sub('[data-st="nombres"]'))));
+  [...SEMIO,...FIGURES].forEach(f=>add(f[0],'Symbolique des mots · '+f[1],'Mots',()=>go('symbolique',sub('[data-st="mots"]'))));
+  Object.keys(FONTS).forEach(f=>add(f,'Police Google Fonts · onglet Typographie','Police',()=>go('typo')));
+  SOFT.forEach(s=>{const f=()=>go('logiciels',()=>{lgTab=s.id;lgShow()});add(s.n,'Logiciel · '+s.cat+' · '+s.role,'Logiciel',f);s.cles.forEach(c=>add(c[0],s.n+' · '+c[1],'Notion',f))});
+  SOFT2.forEach(s=>add(s[0],'Logiciel · '+s[2]+' · '+s[3],'Logiciel',()=>go('logiciels',()=>{lgTab='autres';lgShow()})));
+  ARTCRAFT.forEach(a=>add(a[0],'ArtCraft · gratuit, comme '+a[1],'Logiciel',()=>go('logiciels')));
+  LIVRABLES.forEach(l=>add(l[0],'UX · '+l[1],'UI / UX',()=>go('uxui',sub('[data-ux="bases"]'))));
+  UIRULES.forEach(r=>add(r[0],'Interface · '+r[1],'UI / UX',()=>go('uxui',sub('[data-ux="ui"]'))));
+  A11Y.forEach(r=>add(r[0],'Accessibilité · '+r[1],'UI / UX',()=>go('uxui',sub('[data-ux="a11y"]'))));
+  HEUR.forEach(r=>add(r[0],'Heuristique de Nielsen · '+r[1],'UI / UX',()=>go('uxui',sub('[data-ux="heur"]'))));
+  LOIS.forEach(r=>add(r[0],'Loi UX · '+r[1],'UI / UX',()=>go('uxui',sub('[data-ux="heur"]'))));
+  GESTALT.forEach(r=>add('Gestalt : '+r[0],r[1],'UI / UX',()=>go('uxui',sub('[data-ux="gestalt"]'))));
+  CERTS.forEach(c=>add(c[0],'Certification · '+c[1]+' · '+c[4],'Certification',()=>go('certifs'),c[5]));
+  RES.forEach(g=>g[2].forEach(r=>add(r[0],g[0]+' · '+r[2],'Ressource',()=>{$('#searchDlg').close();window.open(r[1],'_blank','noopener')},r[3]||'')));
+  IA_TOOLS.forEach(t=>add(t[0],'Outil IA · '+t[2],'IA',()=>go('ia',sub('[data-ia="outils"]'))));
+  DROIT.forEach(d=>add(d[0],"Droit d'auteur · "+d[1],'Droit',()=>go('ia',sub('[data-ia="droit"]'))));
+  [...LIC_FONTS,...LIC_IMG].forEach(d=>add(d[0],'Licences · '+d[1],'Droit',()=>go('ia',sub('[data-ia="licences"]'))));
+  add('Générateur de prompt','IA · construire un prompt image','Outil',()=>go('ia',sub('[data-ia="prompts"]')));
+  PR_FILE.forEach(p=>add(p[0],'Impression · '+p[1],'Impression',()=>go('print',sub('[data-pr="fichier"]'))));
+  PAPIER_TYPES.forEach(p=>add(p[0],'Papier · '+p[1],'Impression',()=>go('print',sub('[data-pr="papiers"]'))));
+  FINITIONS.forEach(p=>add(p[0],'Finition · '+p[1],'Impression',()=>go('print',sub('[data-pr="finitions"]'))));
+  [...PLIS,...RELIURES].forEach(p=>add(p[0],'Façonnage · '+p[1],'Impression',()=>go('print',sub('[data-pr="finitions"]'))));
+  add('BAT (bon à tirer)','Impression · vérifier avant de signer','Impression',()=>go('print',sub('[data-pr="bat"]')));
+  add('Demande de devis imprimeur','Impression · modèle à copier','Outil',()=>go('print',sub('[data-pr="imprimeur"]')));
+  [['Convertisseur de couleurs','HEX, RVB, CMJN, HSL'],['Extraire une palette d\'une image','couleurs dominantes'],['Calcul de pixels pour l\'impression','format, dpi, A4, A3'],['Convertisseur d\'unités','px, rem, mm, cm, pouces'],['Calcul de ratio','proportions, 16:9'],['Générateur de dégradé','CSS gradient']].forEach(t=>add(t[0],'Outil · '+t[1],'Outil',()=>go('outils')));
+  [['Cercle chromatique','harmonies, complémentaires'],['Contraste de couleurs','WCAG'],['Contrastes d\'Itten','les 7 contrastes']].forEach(t=>add(t[0],'Couleurs · '+t[1],'Outil',()=>go('couleurs')));
+  ETAPES.forEach(e=>add(e[0],'Méthode de projet · '+e[1],'Méthode',()=>go('methode',sub('[data-mt="projet"]'))));
+  add('Check-list de mise en ligne','Méthode · avant de publier un site','Outil',()=>go('methode',sub('[data-mt="check"]')));
+  add('Questions du brief','Méthode · à poser au client','Outil',()=>go('methode',sub('[data-mt="projet"]')));
+  GAMES.forEach(g=>add(g[0],'Jeu de code · '+g[4],'Code',()=>go('code')));
+  return I}
+const KORD=['Rubrique','Outil','Logiciel','Artiste','Lexique','UI / UX','Impression','IA','Droit','Certification','Couleur','Forme','Nombre','Mots','Police','Notion','Méthode','Code','Ressource'];
+function sRun(){const q=norm($('#sq').value.trim());if(!SIDX)SIDX=buildIdx();
+  if(!q){sHits=SIDX.filter(x=>x.k==='Rubrique')}else{const w=q.split(/\s+/);
+    sHits=SIDX.filter(x=>w.every(t=>x.n.includes(t)||x.m.includes(t))).map(x=>({x,r:x.n.startsWith(q)?0:x.n.includes(q)?1:w.every(t=>x.n.includes(t))?2:3})).sort((a,b)=>a.r-b.r||KORD.indexOf(a.x.k)-KORD.indexOf(b.x.k)||a.x.t.localeCompare(b.x.t,'fr')).slice(0,40).map(o=>o.x)}
+  sSel=0;sDraw()}
+function sDraw(){$('#sres').innerHTML=sHits.length?sHits.map((h,i)=>`<button class="sh${i===sSel?' on':''}" role="option" aria-selected="${i===sSel}" data-si="${i}"><span class="sk2">${h.k}</span><span class="st2"><b>${esc(h.t)}</b><small>${esc(h.s.length>110?h.s.slice(0,110)+'…':h.s)}</small></span></button>`).join(''):`<p class="empty" style="margin:16px">Rien trouvé. Essayez un autre mot, sans faute de frappe ni pluriel.</p>`;
+  const on=$('#sres .sh.on');if(on)on.scrollIntoView({block:'nearest'})}
+function sOpen(){const d=$('#searchDlg');if(!d.open)d.showModal();$('#sq').value='';sRun();setTimeout(()=>$('#sq').focus(),20)}
+$('#searchBtn').onclick=sOpen;
+$('#sq').addEventListener('input',sRun);
+$('#sq').addEventListener('keydown',e=>{if(e.key==='ArrowDown'){e.preventDefault();sSel=Math.min(sSel+1,sHits.length-1);sDraw()}else if(e.key==='ArrowUp'){e.preventDefault();sSel=Math.max(sSel-1,0);sDraw()}else if(e.key==='Enter'){e.preventDefault();const h=sHits[sSel];if(h)h.f()}});
+$('#sres').addEventListener('click',e=>{const b=e.target.closest('[data-si]');if(b)sHits[+b.dataset.si].f()});
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();sOpen()}else if(e.key==='/'&&!/input|textarea|select/i.test(document.activeElement.tagName)&&!document.querySelector('dialog[open]')){e.preventDefault();sOpen()}});
+if(/Mac|iPhone|iPad/.test(navigator.platform||''))$('#searchBtn .sk').textContent='⌘ K';
 
 renderDay();route();
 if(!auth)renderAcct();

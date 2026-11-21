@@ -17,7 +17,7 @@
 <header class="top">
   <div class="bar">
     <a class="brand" href="#aujourdhui"><i><b></b><b></b><b></b><b></b></i>Atelier <small>la boîte à outils du graphiste</small></a>
-    <button class="btn sm" id="acctBtn">Se connecter</button>
+    <div class="bar-r"><button class="btn sm sbtn" id="searchBtn" aria-label="Rechercher dans tout le site (Ctrl+K)"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg><span class="sl">Rechercher</span><kbd class="sk">Ctrl K</kbd></button><button class="btn sm" id="acctBtn">Se connecter</button></div>
   </div>
   <nav class="groups" id="groups" aria-label="Rubriques"></nav>
   <nav class="tabs" id="subnav" aria-label="Sous-rubriques"></nav>
@@ -340,6 +340,43 @@
   <div class="sec rule"><h3 style="margin-bottom:16px">Quel parcours selon votre métier ?</h3><div class="parcours" id="parcours"></div></div>
 </div></section>
 
+<!-- ================= IMPRESSION ================= -->
+<section class="tab band" id="t-print" hidden><div class="wrap">
+  <div class="head"><div><h2>Impression</h2><p class="lead" style="margin-top:10px">De l'écran au papier sans mauvaise surprise : préparer un fichier, choisir le papier et les finitions, vérifier un BAT et parler le même langage que l'imprimeur.</p></div></div>
+  <div class="seg" id="prTabs" role="tablist" style="margin-bottom:28px"><button class="btn" data-pr="fichier" aria-pressed="true">Préparer le fichier</button><button class="btn" data-pr="papiers" aria-pressed="false">Papiers</button><button class="btn" data-pr="finitions" aria-pressed="false">Finitions & façonnage</button><button class="btn" data-pr="bat" aria-pressed="false">Le BAT</button><button class="btn" data-pr="imprimeur" aria-pressed="false">Parler à l'imprimeur</button></div>
+  <div class="prp" id="pr-fichier"><div class="sw-ui"><figure class="uifig" id="bleedFig"></figure><div><h3 style="margin-bottom:10px">Les trois zones d'un document</h3><ol class="uileg"><li><span><b>Fond perdu</b> (rouge) : ce qui dépasse et sera coupé, 3 mm.</span></li><li><span><b>Format fini</b> (trait noir) : là où passe la lame.</span></li><li><span><b>Zone de sécurité</b> (pointillés bleus) : textes et logos restent à l'intérieur.</span></li></ol><p class="small" style="margin-top:12px">Pour calculer les pixels d'un format et vérifier une résolution : <a href="#outils">onglet Outils</a>.</p></div></div>
+    <div class="sec rule"><h3 style="margin-bottom:16px">La check-list du fichier prêt à imprimer</h3><div class="rules" id="prFile"></div></div></div>
+  <div class="prp" id="pr-papiers" hidden><h3 style="margin-bottom:6px">Le grammage</h3><p class="lead" style="margin-bottom:16px">Le poids d'une feuille de 1 m², en grammes. Plus il est élevé, plus le papier est épais et rigide.</p><div class="gram" id="gram"></div>
+    <div class="sec rule"><h3 style="margin-bottom:16px">Les familles de papier</h3><div class="figs" id="papTypes"></div><p class="small" style="margin-top:14px">Demandez toujours un échantillon ou une « liasse » de papiers à votre imprimeur : le toucher compte autant que l'image.</p></div></div>
+  <div class="prp" id="pr-finitions" hidden><div class="concepts" id="finitions"></div>
+    <div class="sec rule"><h3 style="margin-bottom:16px">Les plis</h3><div class="plis" id="plis"></div></div>
+    <div class="sec rule"><h3 style="margin-bottom:16px">Les reliures</h3><div class="figs" id="reliures"></div></div></div>
+  <div class="prp" id="pr-bat" hidden><div class="callout"><b>BAT = bon à tirer.</b> C'est la dernière épreuve que vous validez avant l'impression. En le signant, vous acceptez tout ce qu'il contient : une faute laissée sur le BAT est à votre charge, pas à celle de l'imprimeur.</div>
+    <h3 style="margin:24px 0 14px">À vérifier avant de signer</h3><div class="checks" id="batList"></div>
+    <p class="small" style="margin-top:14px">Un BAT PDF sert à vérifier le contenu. Pour juger les couleurs, demandez une épreuve contractuelle (épreuve couleur certifiée).</p></div>
+  <div class="prp" id="pr-imprimeur" hidden><h3 style="margin-bottom:16px">Numérique ou offset ?</h3><div class="grid2" id="offset"></div>
+    <div class="sec rule"><div class="head" style="margin-bottom:12px"><h3>Le modèle de demande de devis</h3><button class="btn sm solid" id="devisCopy">Copier le modèle</button></div><pre class="devis" id="devisTxt"></pre><p class="small" style="margin-top:10px">Le format fini est la taille après coupe et pliage ; le format ouvert, la taille à plat avant pliage.</p></div></div>
+</div></section>
+
+<!-- ================= IA & DROIT ================= -->
+<section class="tab band" id="t-ia" hidden><div class="wrap">
+  <div class="head"><div><h2>IA & droit d'auteur</h2><p class="lead" style="margin-top:10px">Utiliser l'IA comme un outil, sans se mettre en danger, et connaître les règles du droit d'auteur, des licences de polices et d'images. Ce que tout graphiste doit savoir avant de livrer à un client.</p></div></div>
+  <div class="seg" id="iaTabs" role="tablist" style="margin-bottom:20px"><button class="btn" data-ia="travail" aria-pressed="true">L'IA au travail</button><button class="btn" data-ia="outils" aria-pressed="false">Les outils</button><button class="btn" data-ia="prompts" aria-pressed="false">Écrire un prompt</button><button class="btn" data-ia="livrer" aria-pressed="false">Livrer avec l'IA</button><button class="btn" data-ia="droit" aria-pressed="false">Droit d'auteur</button><button class="btn" data-ia="licences" aria-pressed="false">Licences</button></div>
+  <p class="small" style="margin:0 0 24px">Informations générales à jour en novembre 2026, pas un conseil juridique. Pour un contrat important, demandez à un juriste.</p>
+  <div class="iap" id="ia-travail"><div class="scroll"><table class="tstack"><thead><tr><th>Étape</th><th>Ce que l'IA fait bien</th><th>Ce qui reste à vous</th></tr></thead><tbody id="iaUses"></tbody></table></div>
+    <div class="sec rule"><h3 style="margin-bottom:12px">Ce que l'IA ne fera pas à votre place</h3><ul class="errs" id="iaNot"></ul></div></div>
+  <div class="iap" id="ia-outils" hidden><p class="lead" style="margin-bottom:16px">Les outils changent tous les mois : retenez surtout à quoi sert chaque famille d'outils et vérifiez toujours les conditions d'utilisation de votre formule.</p><div class="certs" id="iaTools"></div></div>
+  <div class="iap" id="ia-prompts" hidden><div class="grid2 pb"><div><h3 style="margin-bottom:6px">Le générateur de prompt image</h3><p class="lead" style="margin-bottom:14px">Remplissez les cases (les exemples sont en gris), le prompt se construit tout seul.</p><div id="pbForm" class="pbform"></div></div>
+    <div><h3 style="margin-bottom:10px">Votre prompt</h3><textarea id="pbOut" rows="7" readonly aria-label="Prompt généré"></textarea><div class="acts" style="margin-top:10px"><button class="btn sm solid" id="pbCopy">Copier le prompt</button><button class="btn sm" id="pbEx">Voir l'exemple</button><button class="btn sm" id="pbClear">Effacer</button></div>
+    <h4 style="margin-top:22px">Trois règles</h4><ul class="errs ok" id="pbRules"></ul></div></div>
+    <div class="sec rule"><h3 style="margin-bottom:12px">Pour un assistant texte (Claude, ChatGPT…)</h3><ol class="qbrief" id="pTxt"></ol></div></div>
+  <div class="iap" id="ia-livrer" hidden><div class="nums" id="iaLivrer"></div></div>
+  <div class="iap" id="ia-droit" hidden><div class="figs" id="droit"></div><p class="small" style="margin-top:16px">Pour aller plus loin : le Code de la propriété intellectuelle sur legifrance.gouv.fr, et les fiches de la Maison des Artistes et de l'INPI.</p></div>
+  <div class="iap" id="ia-licences" hidden><h3 style="margin-bottom:16px">Les polices</h3><div class="rules" id="licFonts"></div>
+    <div class="sec rule"><h3 style="margin-bottom:16px">Les licences Creative Commons</h3><div class="ccs" id="licCC"></div></div>
+    <div class="sec rule"><h3 style="margin-bottom:16px">Les images, les personnes et les marques</h3><div class="rules" id="licImg"></div></div></div>
+</div></section>
+
 <!-- ================= LEXIQUE ================= -->
 <section class="tab band" id="t-lexique" hidden><div class="wrap">
   <div class="head"><div><h2>Lexique du graphiste</h2><p class="lead" style="margin-top:10px"><span id="lexN"></span> mots du métier, de la couleur à l'impression, du web aux mouvements artistiques. Mettez en favori ceux à réviser, puis testez-vous.</p></div>
@@ -430,6 +467,7 @@
 </div></footer>
 
 <!-- Modal artiste -->
+<dialog id="searchDlg" class="sdlg" aria-label="Rechercher"><div class="sbox"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg><input type="search" id="sq" placeholder="Artiste, mot, logiciel, certification, couleur…" autocomplete="off" aria-label="Rechercher dans tout le site" aria-controls="sres"><button class="btn sm" data-close>Échap</button></div><div class="sres" id="sres" role="listbox"></div><p class="shint small">↑ ↓ pour naviguer · Entrée pour ouvrir · Échap pour fermer</p></dialog>
 <dialog id="artModal" aria-label="Fiche artiste"><div class="dlg-head"><button class="btn sm" data-close>Fermer ✕</button></div><div class="dlg-body" id="artBody"></div></dialog>
 
 <!-- Modal compte -->
@@ -458,6 +496,7 @@
 <script src="js/data4.js"></script>
 <script src="js/data5.js"></script>
 <script src="js/data6.js"></script>
+<script src="js/data7.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
