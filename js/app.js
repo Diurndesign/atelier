@@ -253,7 +253,15 @@ $('#swap').onclick=()=>{const a=$('#fgT').value;$('#fgT').value=$('#bgT').value;
 
 /* ---------- symbolism ---------- */
 function renderSym(){$('#sym').innerHTML=SYM.map(c=>`<article><div class="shades">${c[1].map((h,i)=>`<i style="background:${h};color:${best(h)}">${c[2][i]}</i>`).join('')}</div><div class="txt"><h3>${c[0]} ${favBtn('color',c[1][1],c[0]+' (symbolique)',{hex:c[1][1]},true)}</h3><p><b>+ </b>${c[3]}</p><p><b>− </b>${c[4]}</p><p><b>Ailleurs : </b>${c[5]}</p><p><b>Usage : </b>${c[6]}</p></div></article>`).join('')}
-onShow.symbolique=renderSym;
+let symTab='couleurs';
+$('#symTabs').addEventListener('click',e=>{const b=e.target.closest('[data-st]');if(!b)return;symTab=b.dataset.st;$$('#symTabs .btn').forEach(x=>x.setAttribute('aria-pressed',x===b));$$('.stp').forEach(p=>p.hidden=p.id!=='st-'+symTab)});
+function renderSym2(){
+  $('#formes').innerHTML=FORMES.map(f=>`<div class="forme"><svg viewBox="0 0 100 100" aria-hidden="true">${f[1]}</svg><h4>${f[0]} ${favBtn('term','Forme : '+f[0],'Forme : '+f[0],{},true)}</h4><p>${f[2]}</p><p class="small">${f[3]}</p></div>`).join('');
+  $('#semio').innerHTML=SEMIO.map(s=>`<div class="rule" style="border-top-width:2px"><h4>${s[0]}</h4><p style="font-size:15px">${s[1]}</p><p class="small" style="margin:0"><b>Exemple : </b>${s[2]}</p></div>`).join('');
+  $('#figs').innerHTML=FIGURES.map(f=>`<div class="fig2"><h4 style="display:flex;justify-content:space-between;gap:8px;align-items:center">${f[0]} ${favBtn('term','Figure : '+f[0],'Figure de style : '+f[0],{},true)}</h4><p>${f[1]}</p><p><b>En mots : </b>${f[2]}</p><p class="small"><b>En image : </b>${f[3]}</p></div>`).join('');
+  $('#univ').innerHTML=UNIVERS.map(u=>`<tr><td data-l="Univers"><b>${u[0]}</b></td><td data-l="Mots">${u[1]}</td><td data-l="Typo">${u[2]}</td><td data-l="Couleurs">${u[3]}</td></tr>`).join('');
+  $('#nums').innerHTML=NOMBRES.map(n=>`<div class="num"><b class="n">${n[0]}</b><h4>${n[1]} ${favBtn('term','Nombre : '+n[0],'Nombre : '+n[0]+' ('+n[1]+')',{},true)}</h4><p>${n[2]}</p>${n[3]!=='—'?`<p class="small"><b>Ailleurs : </b>${n[3]}</p>`:''}${n[4]!=='—'?`<p class="small"><b>En design : </b>${n[4]}</p>`:''}</div>`).join('')}
+onShow.symbolique=()=>{renderSym();renderSym2()};
 
 /* ---------- composition ---------- */
 const G=[
@@ -429,7 +437,7 @@ function espaceGroup(k,l){const del=r=>favBtn(r.kind,r.key,r.label,r.data,true);
   if(k==='color')return `<div class="swatches">${l.map(r=>`<div class="sw" style="cursor:default"><i style="background:${esc(r.data.hex)}"></i><span><b>${esc(r.data.hex)}</b>${esc(r.label)}<span style="display:flex;gap:6px;margin-top:6px;padding:0"><button class="btn sm" data-copy="${esc(r.data.hex)}">Copier</button>${del(r)}</span></span></div>`).join('')}</div>`;
   if(k==='font'){l.forEach(r=>loadFont(r.data.font));return `<div class="grid2">${l.map(r=>`<div class="panel" style="background:var(--bg);border:2px solid var(--line)"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>${esc(r.data.font)} · ${esc(r.data.weight)}</b>${del(r)}</div><p style="font-family:'${esc(r.data.font)}',serif;font-weight:${esc(r.data.weight)};font-size:36px;line-height:1.15;margin:10px 0;overflow-wrap:anywhere">Aa Le vif zéphyr</p><div class="seg"><button class="btn sm" data-copy="${esc(`@import url('${fontURL(r.data.font)}');`)}" data-copy-label="@import copié">Copier l'@import</button><a class="btn sm" href="https://fonts.google.com/specimen/${esc(r.data.font.replace(/ /g,'+'))}" target="_blank" rel="noopener">Google Fonts ↗</a></div></div>`).join('')}</div>`}
   if(k==='pair'){const ps=l.map(r=>PAIRS.find(p=>p[0]+'+'+p[2]===r.key)).filter(Boolean);ps.forEach(p=>{loadFont(p[0]);loadFont(p[2])});return `<div class="pairs">${ps.map(pairCard).join('')}</div>`}
-  if(k==='term')return `<dl class="lexgrid">${l.map(r=>LEX.find(t=>t[0]===r.key)).filter(Boolean).map(t=>`<div class="term"><dt>${t[0]}<span>${t[1]}</span></dt><dd>${t[2]}</dd>${favBtn('term',t[0],t[0],{},true)}</div>`).join('')}</dl>`;
+  if(k==='term')return `<dl class="lexgrid">${l.map(r=>{const t=LEX.find(x=>x[0]===r.key)||[r.key,'Symbolique','<a href="#symbolique">Voir dans l\u2019onglet Symbolique</a>'];return `<div class="term"><dt>${esc(r.label||t[0])}<span>${t[1]}</span></dt><dd>${t[2]}</dd>${favBtn('term',r.key,r.label,{},true)}</div>`}).join('')}</dl>`;
   if(k==='gabarit')return `<div class="gab show-grid show-read">${l.map(r=>G.find(g=>g[0]===r.key)).filter(Boolean).map(g=>`<article>${gabSvg(g)}<div><h4 style="display:flex;justify-content:space-between;gap:8px">${g[0]} ${favBtn('gabarit',g[0],g[0],{},true)}</h4><p class="small">${g[5]}</p></div></article>`).join('')}</div>`;
   if(k==='logo')return `<div class="seg">${l.map(r=>`<span class="panel" style="padding:8px 14px;display:inline-flex;gap:10px;align-items:center"><b>${esc(r.key)}</b>${del(r)}</span>`).join('')} <a class="btn sm" href="#logos">Voir les familles</a></div>`;
   if(k==='resource')return `<div class="refs">${l.map(r=>{const f=RES.flatMap(g=>g[1]).find(x=>x[1]===r.key)||[r.data.name,r.key,r.data.desc||'',''];return refCard(f)}).join('')}</div>`;
