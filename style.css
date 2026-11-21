@@ -311,6 +311,14 @@ dialog::backdrop{background:rgba(10,10,10,.6)}
 .lang{font-size:12px;font-weight:800;padding:2px 8px;border-radius:99px;background:var(--panel)}
 @media (max-width:1000px){.snips{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:820px){.games,.snips{grid-template-columns:minmax(0,1fr)}}
+.ref .lab{margin:4px 0 0;font-size:12px;font-weight:800;letter-spacing:.02em;color:var(--mute)}
+.lang.fr{background:var(--blue);color:#fff}
+.refstats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:0 0 18px}
+.refstats div{border-top:3px solid var(--ink);padding-top:8px;font-weight:700;color:var(--mute)}
+.refstats b{display:block;font-size:clamp(36px,5vw,56px);font-weight:900;font-stretch:112%;line-height:1;color:var(--ink)}
+.coltip{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:center;background:var(--panel);border-radius:16px;padding:20px;margin-top:20px}
+.coltip pre{margin:0;background:var(--bg)}
+@media (max-width:820px){.coltip{grid-template-columns:minmax(0,1fr)}.refstats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* espace */
 .empty{border:2px dashed var(--line);border-radius:16px;padding:22px;color:var(--mute)}
 .mine-pal{display:flex;border-radius:10px;overflow:hidden;height:56px;margin:6px 0}

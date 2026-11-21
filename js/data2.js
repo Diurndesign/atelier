@@ -354,12 +354,4 @@ const SNIPS=[
 ["Squelette HTML de base","HTML","<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <title>Mon projet</title>\n  <link rel=\"stylesheet\" href=\"style.css\">\n</head>\n<body>\n  <script src=\"script.js\" defer></script>\n</body>\n</html>"],
 ["Menu burger","JS","const bouton = document.querySelector('.burger');\nconst menu = document.querySelector('.menu');\n\nbouton.addEventListener('click', () => {\n  menu.classList.toggle('ouvert');\n  const ouvert = menu.classList.contains('ouvert');\n  bouton.setAttribute('aria-expanded', ouvert);\n});"],
 ["Filtrer une galerie","JS","const boutons = document.querySelectorAll('[data-filtre]');\nconst cartes = document.querySelectorAll('.carte');\n\nboutons.forEach(bouton => {\n  bouton.addEventListener('click', () => {\n    const filtre = bouton.dataset.filtre;\n    cartes.forEach(carte => {\n      carte.hidden = filtre !== 'tout' && carte.dataset.categorie !== filtre;\n    });\n  });\n});"]];
-const LEARN=[
-["Flexbox Froggy","https://flexboxfroggy.com/#fr","Apprendre Flexbox en aidant des grenouilles."],
-["Grid Garden","https://cssgridgarden.com/#fr","Apprendre CSS Grid en arrosant un potager."],
-["CSS Diner","https://flukeout.github.io/","Apprendre les sélecteurs CSS en jouant."],
-["MDN Web Docs","https://developer.mozilla.org/fr/","La documentation de référence du web, en français."],
-["JavaScript.info","https://fr.javascript.info/","Le tutoriel JavaScript moderne, complet et gratuit."],
-["Can I use","https://caniuse.com/","Vérifier qu'une propriété marche dans tous les navigateurs."],
-["Frontend Mentor","https://www.frontendmentor.io/","Des maquettes réelles à intégrer, du plus simple au plus dur."],
-["CodePen","https://codepen.io","Tester et partager du HTML, CSS et JS en ligne."]];
+

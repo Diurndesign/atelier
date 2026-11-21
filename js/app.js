@@ -409,11 +409,15 @@ function sampleImg(){const cv=document.createElement('canvas');cv.width=300;cv.h
   const url=cv.toDataURL(),img=new Image();img.onload=()=>{$('#dropTxt').innerHTML=`<img src="${url}" alt="Image d'exemple"><span class="small">Exemple. Cliquez ou déposez votre propre image.</span>`;extract(img);$('#imgName').value='Palette exemple'};img.src=url}
 let toolsInit=false;onShow.outils=()=>{if(toolsInit)return;toolsInit=true;conv();printCalc();units();ratioCalc();grad();sampleImg()};
 
-/* ---------- références ---------- */
-$('#refnav').innerHTML=RES.map((g,i)=>`<a class="btn sm" href="#references" data-ref="${i}">${g[0]}</a>`).join('');
+/* ---------- références (guide Boîte à outils du designer web) ---------- */
+const slug=s=>norm(s).replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+$('#refnav').innerHTML=RES.map((g,i)=>`<a class="btn sm" href="#references" data-ref="${i}">${g[0]} <span class="small" style="color:inherit;opacity:.7">${g[2].length}</span></a>`).join('');
 $('#refnav').addEventListener('click',e=>{const b=e.target.closest('[data-ref]');if(!b)return;e.preventDefault();document.getElementById('rg'+b.dataset.ref).scrollIntoView({behavior:'smooth'})});
-const refCard=r=>`<article class="ref"><a class="n" href="${r[1]}" target="_blank" rel="noopener">${r[0]} ↗</a><p style="margin:0;font-size:15px">${r[2]}</p>${r[3]?`<p class="tip" style="margin:0">${r[3]}</p>`:''}<div class="acts">${favBtn('resource',r[1],r[0],{name:r[0],url:r[1],desc:r[2]},false)}</div></article>`;
-onShow.references=()=>{$('#refs').innerHTML=RES.map((g,i)=>`<div class="sec rule" id="rg${i}" style="${i?'':'margin-top:0'}"><h3>${g[0]}</h3><div class="refs">${g[1].map(refCard).join('')}</div></div>`).join('')};
+const refCard=r=>`<article class="ref"><div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"><a class="n" href="${r[1]}" target="_blank" rel="noopener">${r[0]} ↗</a>${r[4]?`<span class="lang ${r[4]==='FR'?'fr':''}" title="${r[4]==='FR'?'Contenu en français':'En anglais, facile à utiliser'}">${r[4]}</span>`:''}</div><span class="small" style="margin-top:-4px;overflow-wrap:anywhere">${r[1].replace(/^https?:\/\/(www\.)?/,'').replace(/\/$/,'')}</span><p class="lab">À quoi ça sert</p><p style="margin:0;font-size:15px">${r[2]}</p>${r[3]?`<p class="lab">En quoi ça vous aide</p><p class="tip" style="margin:0">${r[3]}</p>`:''}<div class="acts">${favBtn('resource',r[1],r[0],{name:r[0],url:r[1],desc:r[2]},false)}</div></article>`;
+const COLTIP=`<div class="coltip"><div><h4>Récupérer une couleur en code</h4><p style="margin:0;font-size:15px">Sur Coolors, Color Hunt ou UI Colors, un clic sur une couleur copie son code hex (par exemple #010d94). Collez-le dans une variable CSS : vous changez la couleur à un seul endroit et tout le site suit.</p><div class="chips" style="margin-top:10px"><span><i style="background:#010d94"></i>#010d94</span><span><i style="background:#f7f7fa;box-shadow:0 0 0 1px #ccc inset"></i>#f7f7fa</span><span><i style="background:#0b0d22"></i>#0b0d22</span></div></div><pre><code>:root {\n  --couleur-principale: #010d94;\n  --couleur-fond: #f7f7fa;\n  --couleur-texte: #0b0d22;\n}\n.bouton {\n  background: var(--couleur-principale);\n  color: var(--couleur-fond);\n}</code></pre></div>`;
+onShow.references=()=>{const pdf=RES.slice(0,9),n=pdf.reduce((t,g)=>t+g[2].length,0),fr=pdf.reduce((t,g)=>t+g[2].filter(r=>r[4]==='FR').length,0);
+  $('#refStats').innerHTML=`<div><b>${n}</b>sites</div><div><b>9</b>catégories</div><div><b>${fr}</b>en français</div><div><b>${RES.reduce((t,g)=>t+g[2].length,0)-n}</b>compléments Atelier</div>`;
+  $('#refs').innerHTML=RES.map((g,i)=>`${i===9?'<h2 class="sec" style="font-size:32px">Pour aller plus loin</h2>':''}<div class="sec rule" id="rg${i}" style="${i?'':'margin-top:0'}"><h3>${i<9?`<span class="eyebrow" style="margin-right:10px">0${i+1} / 9</span>`:''}${g[0]}</h3><p class="lead" style="margin:6px 0 16px">${g[1]}</p><div class="refs">${g[2].map(refCard).join('')}</div>${g[0]==='Couleurs'?COLTIP:''}</div>`).join('')};
 
 /* ---------- code ---------- */
 const bip=c=>`<svg viewBox="0 0 96 96" aria-hidden="true"><line x1="48" y1="6" x2="48" y2="20" stroke="#111" stroke-width="4"/><circle cx="48" cy="6" r="5" fill="#e4002b"/><rect x="18" y="20" width="60" height="46" rx="12" fill="#fff" stroke="#111" stroke-width="4"/><circle cx="36" cy="42" r="7" fill="#111"/><circle cx="60" cy="42" r="7" fill="#111"/><rect x="36" y="54" width="24" height="5" rx="2.5" fill="${c}"/><rect x="28" y="70" width="40" height="20" rx="6" fill="#111"/></svg>`;
@@ -421,7 +425,7 @@ let codeInit=false;
 onShow.code=()=>{
   $('#games').innerHTML=GAMES.map(g=>`<article class="game"><div class="scr" style="--g:${g[6]};color:${g[6]==='#ffc400'?'#111':'#fff'}">${bip(g[6]==='#ffc400'?'#1f3fd1':'#ffc400')}<div><b>${g[0]}</b><br><span>${g[3]}</span></div></div><div class="in"><p style="font-size:17px;margin:0">${g[4]}</p><p class="small" style="margin:0">${g[5]}</p><div class="acts"><a class="btn solid" href="${g[1]}" target="_blank" rel="noopener">Jouer ↗</a><a class="btn sm" href="${g[2]}" target="_blank" rel="noopener">Code source ↗</a>${favBtn('resource',g[1],g[0],{name:g[0],url:g[1],desc:g[4]},true)}</div></div></article>`).join('');
   $('#snips').innerHTML=SNIPS.map(s=>`<div class="snip"><h4>${esc(s[0])} <span class="lang">${s[1]}</span></h4><pre><code>${esc(s[2])}</code></pre><button class="btn sm" data-copy="${esc(s[2])}" data-copy-label="Code copié">Copier</button></div>`).join('');
-  $('#learn').innerHTML=LEARN.map(l=>refCard([l[0],l[1],l[2],''])).join('')};
+  $('#learn').innerHTML=[...RES[0][2],...RES[1][2]].map(refCard).join('')};
 
 /* ---------- mon espace ---------- */
 const KINDS=[['artist','Artistes'],['palette','Palettes'],['color','Couleurs'],['font','Polices'],['pair','Associations de polices'],['term','Vocabulaire et symboles'],['gabarit','Gabarits d’affiche'],['logo','Familles de logos'],['resource','Références']];
@@ -450,7 +454,7 @@ function espaceGroup(k,l){const del=r=>favBtn(r.kind,r.key,r.label,r.data,true);
   if(k==='term')return `<dl class="lexgrid">${l.map(r=>{const t=LEX.find(x=>x[0]===r.key)||[r.key,'Symbolique','<a href="#symbolique">Voir dans l\u2019onglet Symbolique</a>'];return `<div class="term"><dt>${esc(r.label||t[0])}<span>${t[1]}</span></dt><dd>${t[2]}</dd>${favBtn('term',r.key,r.label,{},true)}</div>`}).join('')}</dl>`;
   if(k==='gabarit')return `<div class="gab show-grid show-read">${l.map(r=>G.find(g=>g[0]===r.key)).filter(Boolean).map(g=>`<article>${gabSvg(g)}<div><h4 style="display:flex;justify-content:space-between;gap:8px">${g[0]} ${favBtn('gabarit',g[0],g[0],{},true)}</h4><p class="small">${g[5]}</p></div></article>`).join('')}</div>`;
   if(k==='logo')return `<div class="seg">${l.map(r=>`<span class="panel" style="padding:8px 14px;display:inline-flex;gap:10px;align-items:center"><b>${esc(r.key)}</b>${del(r)}</span>`).join('')} <a class="btn sm" href="#logos">Voir les familles</a></div>`;
-  if(k==='resource')return `<div class="refs">${l.map(r=>{const f=RES.flatMap(g=>g[1]).find(x=>x[1]===r.key)||[r.data.name,r.key,r.data.desc||'',''];return refCard(f)}).join('')}</div>`;
+  if(k==='resource')return `<div class="refs">${l.map(r=>{const f=RES.flatMap(g=>g[2]).find(x=>x[1]===r.key)||[r.data.name,r.key,r.data.desc||'','',''];return refCard(f)}).join('')}</div>`;
   return ''}
 onShow.espace=renderEspace;
 
