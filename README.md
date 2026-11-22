@@ -9,13 +9,14 @@ GitHub Pages : https://diurndesign.github.io/atelier/ (chaque push sur `main` me
 ## Comptes : le même que les jeux de code
 
 Atelier utilise le projet Firebase **bip-jeux**, comme tous les jeux de code : La maison de Bip (HTML),
-Mission Kami (CSS), Kami et les lucioles (Flexbox), Le potager de Kami (Grid), Mission Bip et Bip Agence.
+Mission Kami (CSS), Kami et les lucioles (Flexbox), Le potager de Kami (Grid), Kami s’adapte (Responsive),
+Mission Bip et Bip Agence.
 Un élève a donc un seul compte (email + mot de passe) pour les trois sites, et comme
 ils sont tous sur `diurndesign.github.io`, se connecter sur l'un connecte sur les autres.
 
 - Favoris : `eleves/{uid}/atelier/favoris` (une chaîne JSON, comme la sauvegarde des jeux)
 - « Mon espace » lit aussi `eleves/{uid}/jeux/<id>` pour afficher la progression dans chaque jeu
-  (`maison-bip`, `mission-kami`, `kami-lucioles`, `kami-potager`, `mission-bip`, `bip-agence`) : la liste vient de `GAMES` dans `js/data2.js`
+  (`maison-bip`, `mission-kami`, `kami-lucioles`, `kami-potager`, `kami-ecrans`, `mission-bip`, `bip-agence`) : la liste vient de `GAMES` dans `js/data2.js`
 
 Règle Firestore à ajouter (déjà incluse dans les règles proposées par la page admin des jeux) :
 
