@@ -1,7 +1,8 @@
 /* Atelier — application */
 (()=>{
 'use strict';
-/* Même projet Firebase que Mission Bip et Bip Agence : un seul compte pour les trois sites */
+/* Même projet Firebase que les jeux de code (La maison de Bip, Mission Kami, Kami et les lucioles,
+   Le potager de Kami, Mission Bip, Bip Agence) : un seul compte pour tous les sites */
 const FB_CONFIG={apiKey:"AIzaSyDF6idRWnpsezjXYQ_f_7_58O2prxvA9Gc",authDomain:"bip-jeux.firebaseapp.com",projectId:"bip-jeux",storageBucket:"bip-jeux.firebasestorage.app",messagingSenderId:"518939054835",appId:"1:518939054835:web:737987fffa793c14a25d86"};
 let fb=null,auth=null,db=null;
 try{if(window.firebase&&firebase.initializeApp){fb=firebase.apps.length?firebase.app():firebase.initializeApp(FB_CONFIG);auth=firebase.auth();db=firebase.firestore()}}catch(e){fb=null}
@@ -91,7 +92,7 @@ $('#authForm').addEventListener('submit',async e=>{
   const btn=$('#aSubmit');btn.disabled=true;const old=btn.textContent;btn.textContent='Un instant…';
   try{
     if(mode==='in'){await auth.signInWithEmailAndPassword(em,pw);AM.close();toast('Bienvenue '+pseudo()+' !')}
-    else if(mode==='up'){const ps=$('#aPseudo').value.trim();const cred=await auth.createUserWithEmailAndPassword(em,pw);if(ps){await cred.user.updateProfile({displayName:ps});renderAcct()}AM.close();toast('Compte créé, bienvenue '+(ps||'')+' ! Il marche aussi dans les jeux Bip.')}
+    else if(mode==='up'){const ps=$('#aPseudo').value.trim();const cred=await auth.createUserWithEmailAndPassword(em,pw);if(ps){await cred.user.updateProfile({displayName:ps});renderAcct()}AM.close();toast('Compte créé, bienvenue '+(ps||'')+' ! Il marche aussi dans tous les jeux de code.')}
     else{await auth.sendPasswordResetEmail(em);err.className='ok';err.textContent='Si un compte existe, un lien de réinitialisation vient de partir.'}
   }catch(x){err.textContent=frErr(x)}finally{btn.disabled=false;btn.textContent=old}
 });
@@ -479,16 +480,21 @@ onShow.methode=()=>{
 
 /* ---------- code ---------- */
 const bip=c=>`<svg viewBox="0 0 96 96" aria-hidden="true"><line x1="48" y1="6" x2="48" y2="20" stroke="#111" stroke-width="4"/><circle cx="48" cy="6" r="5" fill="#e4002b"/><rect x="18" y="20" width="60" height="46" rx="12" fill="#fff" stroke="#111" stroke-width="4"/><circle cx="36" cy="42" r="7" fill="#111"/><circle cx="60" cy="42" r="7" fill="#111"/><rect x="36" y="54" width="24" height="5" rx="2.5" fill="${c}"/><rect x="28" y="70" width="40" height="20" rx="6" fill="#111"/></svg>`;
+/* icônes des jeux HTML (la maison de Bip) et CSS (Kami le caméléon) */
+const maison=()=>`<svg viewBox="0 0 96 96" aria-hidden="true"><rect x="58" y="14" width="10" height="20" fill="#fff" stroke="#111" stroke-width="4"/><path d="M10 46L48 14L86 46Z" fill="#1f3fd1" stroke="#111" stroke-width="4" stroke-linejoin="round"/><rect x="18" y="44" width="60" height="36" fill="#fff" stroke="#111" stroke-width="4"/><rect x="26" y="52" width="16" height="14" fill="#8fd3ff" stroke="#111" stroke-width="3"/><path d="M54 80V62a7 7 0 0 1 14 0v18Z" fill="#ff8a3d" stroke="#111" stroke-width="3"/><rect x="10" y="78" width="76" height="8" rx="3" fill="#fff" stroke="#111" stroke-width="4"/></svg>`;
+const kami=()=>`<svg viewBox="0 0 96 96" aria-hidden="true"><path d="M6 78C30 74 66 80 92 74" fill="none" stroke="#8b5e34" stroke-width="6" stroke-linecap="round"/><path d="M68 52C86 50 92 66 84 72C78 76 72 70 76 64" fill="none" stroke="#1fb5a8" stroke-width="7" stroke-linecap="round"/><path d="M28 50C36 36 62 36 72 48C80 58 74 70 60 72C46 74 32 70 28 60Z" fill="#3dcb8b" stroke="#111" stroke-width="4" stroke-linejoin="round"/><circle cx="50" cy="52" r="3.5" fill="#ffd43b"/><circle cx="62" cy="58" r="3" fill="#ffd43b"/><path d="M34 54C30 42 16 40 8 50C4 56 6 64 14 66C22 68 32 66 34 60Z" fill="#3dcb8b" stroke="#111" stroke-width="4" stroke-linejoin="round"/><path d="M18 42C24 36 32 38 34 46L28 48Z" fill="#ff9f43" stroke="#111" stroke-width="3" stroke-linejoin="round"/><circle cx="24" cy="54" r="7" fill="#3dcb8b" stroke="#111" stroke-width="3"/><circle cx="22" cy="54" r="2.6" fill="#111"/><path d="M38 72v6M60 72v6" stroke="#24955f" stroke-width="4" stroke-linecap="round"/></svg>`;
+const gameIcon=g=>{const o=g[7]||{};return o.icon==='maison'?maison():o.icon==='kami'?kami():bip(g[6]==='#ffc400'?'#1f3fd1':'#ffc400')};
 let codeInit=false;
 onShow.code=()=>{
-  $('#games').innerHTML=GAMES.map(g=>`<article class="game"><div class="scr" style="--g:${g[6]};color:${g[6]==='#ffc400'?'#111':'#fff'}">${bip(g[6]==='#ffc400'?'#1f3fd1':'#ffc400')}<div><b>${g[0]}</b><br><span>${g[3]}</span></div></div><div class="in"><p style="font-size:17px;margin:0">${g[4]}</p><p class="small" style="margin:0">${g[5]}</p><div class="acts"><a class="btn solid" href="${g[1]}" target="_blank" rel="noopener">Jouer ↗</a><a class="btn sm" href="${g[2]}" target="_blank" rel="noopener">Code source ↗</a>${favBtn('resource',g[1],g[0],{name:g[0],url:g[1],desc:g[4]},true)}</div></div></article>`).join('');
+  $('#gamePath').innerHTML=GAMES.map(g=>`<a href="${g[1]}" target="_blank" rel="noopener" style="--g:${g[6]};color:${(g[7]||{}).ink||'#fff'}"><b>${(g[7]||{}).lang||''}</b><span>${g[0]}</span></a>`).join('<i aria-hidden="true">→</i>');
+  $('#games').innerHTML=GAMES.map(g=>`<article class="game"><div class="scr" style="--g:${g[6]};color:${(g[7]||{}).ink||(g[6]==='#ffc400'?'#111':'#fff')}">${gameIcon(g)}<div><b>${g[0]}</b><br><span>${(g[7]||{}).step||g[3]}</span></div></div><div class="in"><p style="font-size:17px;margin:0">${g[4]}</p><p class="small" style="margin:0">${g[5]}</p><div class="acts"><a class="btn solid" href="${g[1]}" target="_blank" rel="noopener">Jouer ↗</a><a class="btn sm" href="${g[2]}" target="_blank" rel="noopener">Code source ↗</a>${favBtn('resource',g[1],g[0],{name:g[0],url:g[1],desc:g[4]},true)}</div></div></article>`).join('');
   $('#snips').innerHTML=SNIPS.map(s=>`<div class="snip"><h4>${esc(s[0])} <span class="lang">${s[1]}</span></h4><pre><code>${esc(s[2])}</code></pre><button class="btn sm" data-copy="${esc(s[2])}" data-copy-label="Code copié">Copier</button></div>`).join('');
   $('#learn').innerHTML=[...RES[0][2],...RES[1][2]].map(refCard).join('')};
 
 /* ---------- mon espace ---------- */
 const KINDS=[['artist','Artistes'],['palette','Palettes'],['color','Couleurs'],['font','Polices'],['pair','Associations de polices'],['term','Vocabulaire et symboles'],['gabarit','Gabarits d’affiche'],['logo','Familles de logos'],['resource','Références']];
 function renderEspace(){const rows=[...favs.values()];rows.forEach(r=>REG.set(fid(r.kind,r.key),r));
-  let h=user?`<div class="hero-acct"><div><span class="eyebrow" style="color:#bbb">Mon espace</span><h1 style="margin-top:6px">Bonjour ${esc(pseudo())}</h1><p style="margin:8px 0 0;color:#ccc">${esc(user.email)} · ${rows.length} favori${rows.length>1?'s':''} · le même compte que Mission Bip et Bip Agence.</p></div><div class="seg"><button class="btn" id="logout">Se déconnecter</button></div></div>`
+  let h=user?`<div class="hero-acct"><div><span class="eyebrow" style="color:#bbb">Mon espace</span><h1 style="margin-top:6px">Bonjour ${esc(pseudo())}</h1><p style="margin:8px 0 0;color:#ccc">${esc(user.email)} · ${rows.length} favori${rows.length>1?'s':''} · le même compte que tous les jeux de code.</p></div><div class="seg"><button class="btn" id="logout">Se déconnecter</button></div></div>`
   :`<div class="hero-acct"><div><h1>Mon espace</h1><p style="margin:8px 0 0;color:#ccc">Créez un compte gratuit pour garder vos artistes, palettes, polices et mots préférés, et les retrouver sur tous vos appareils, même après la formation.${rows.length?(rows.length>1?` Les ${rows.length} favoris de cet appareil seront ajoutés à votre compte.`:' Le favori de cet appareil sera ajouté à votre compte.'):''}</p></div><div class="seg"><button class="btn" data-open-auth="up">Créer un compte</button><button class="btn" data-open-auth="in">Se connecter</button></div></div>`;
   if(!rows.length)h+=`<div class="empty" style="margin-top:24px"><b>Rien ici pour l'instant.</b> Cliquez ☆ sur un artiste, une couleur, une police, un mot du lexique ou une référence ; enregistrez une palette depuis l'onglet Couleurs ou Outils.</div>`;
   for(const [k,n] of KINDS){const l=rows.filter(r=>r.kind===k);if(!l.length)continue;h+=`<div class="sec rule"><h3>${n} <span class="count">${l.length}</span></h3>${espaceGroup(k,l)}</div>`}
@@ -498,7 +504,7 @@ function renderEspace(){const rows=[...favs.values()];rows.forEach(r=>REG.set(fi
   const lo=$('#logout');if(lo)lo.onclick=async()=>{await auth.signOut();toast('Déconnecté')};
   const ap=$('#allPal');if(ap)ap.onclick=()=>copy(rows.filter(r=>r.kind==='palette').map(r=>`/* ${r.label} */\n`+cssVars(r.data.colors||[])).join('\n\n'),'Palettes copiées')}
 async function loadGames(){const box=$('#myGames');if(!box)return;
-  const G2=[["mission-bip","Mission Bip",22,"https://diurndesign.github.io/javascript_game/","#ffc400"],["bip-agence","Bip Agence",52,"https://diurndesign.github.io/javascript_avance/","#1f3fd1"]];
+  const G2=GAMES.filter(g=>g[7]&&g[7].id).map(g=>[g[7].id,g[0],g[7].missions,g[1],g[6]]);
   const out=await Promise.all(G2.map(async g=>{let d=null;try{const s=await db.collection('eleves').doc(user.uid).collection('jeux').doc(g[0]).get();if(s.exists)d=JSON.parse(s.data().data||'{}')}catch(e){}
     const p=(d&&d.progress)||{},done=Object.keys(p).length,stars=Object.values(p).reduce((t,v)=>t+(v&&v.stars||0),0),pct=Math.min(100,Math.round(done/g[2]*100));
     return `<div class="panel" style="background:var(--bg);border:2px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="font-size:20px">${g[1]}</b><span class="small">${stars} ★</span></div><p style="margin:8px 0 6px">${d?`<b>${done}</b> mission${done>1?'s':''} réussie${done>1?'s':''} sur ${g[2]}`:'Pas encore commencé'}</p><div style="height:10px;border-radius:99px;background:var(--panel);overflow:hidden"><i style="display:block;height:100%;width:${pct}%;background:${g[4]}"></i></div><p style="margin-top:12px"><a class="btn sm solid" href="${g[3]}" target="_blank" rel="noopener">${d?'Continuer':'Commencer'} ↗</a></p></div>`}));

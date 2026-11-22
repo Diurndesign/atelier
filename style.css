@@ -302,6 +302,11 @@ dialog::backdrop{background:rgba(10,10,10,.6)}
 .refnav{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px}
 /* code */
 .games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.gpath{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:24px}
+.gpath a{background:var(--g);border:3px solid var(--ink);border-radius:14px;padding:8px 14px;text-decoration:none;display:grid;line-height:1.15}
+.gpath a b{font-size:18px;font-weight:900}
+.gpath a span{font-size:13px;font-weight:700;opacity:.9}
+.gpath i{font-style:normal;font-weight:900;font-size:20px}
 .game{border:3px solid var(--ink);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg)}
 .game .scr{background:var(--g);color:#fff;padding:22px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center;min-height:150px}
 .game .scr svg{width:96px;height:96px}
